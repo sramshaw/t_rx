@@ -1,7 +1,7 @@
 from subprocess import call
 from t_rx_operators import *
 from t_rx_parser import *
-
+import os
 
 # use of a tree for representation of nesting of elements in a separate list, nesting given by a rank
 # each leaf is an array such that : 
@@ -160,7 +160,7 @@ def getHpp(operators):
 def getCpp(operators,codeBefore,codeAfter,originalSequenceCode,hppname):
     rootOperator = operators[0]
     name = rootOperator.name
-    cpp = '#include "source0.hpp"\n#include "trx.hpp"\n#include "' + hppname + '"\n\n'
+    cpp = '#include "../../include/trx.hpp"\n#include "' + hppname + '"\n\n'
     cpp = cpp + codeBefore + "/*" + originalSequenceCode + "*/\n  T_RX_CREATE_" + name + "()\n" + codeAfter
     return cpp
 
@@ -186,7 +186,7 @@ def generateCodeForOneFile(fullname):
     
     operators = getFinalOperators(tree)
     hpp = getHpp(operators)
-    cpp = getCpp(operators, codeBefore,codeAfter,originalSequenceCode,hppname)
+    cpp = getCpp(operators, codeBefore,codeAfter,originalSequenceCode, os.path.basename(hppname))
     clang_save(hppname, hpp)
     clang_save(cppname, cpp)
 

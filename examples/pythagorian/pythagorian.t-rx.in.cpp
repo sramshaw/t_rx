@@ -41,9 +41,9 @@ void tests(){
     }
     else
     {
-        source0_subscribe(n_trace,c_trace,nullptr);
-        (*source0_callback)(1);
-        source0_stop(nullptr);
+        //source0_subscribe(n_trace,c_trace,nullptr);
+        //(*source0_callback)(1);
+        //source0_stop(nullptr);
     }
 }
 

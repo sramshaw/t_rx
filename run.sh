@@ -1,1 +1,1 @@
-python -s ./tirnsr_rx.py && ./pythagorian.sh
+python -s ./scripts/tirnsr_rx.py . && sh -c 'cd ./examples/pythagorian/ && ./pythagorian.sh'

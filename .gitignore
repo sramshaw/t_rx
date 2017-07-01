@@ -2,3 +2,5 @@
 *.out.hpp
 *.pyc
 *.swp
+dev.sh
+*.exe
