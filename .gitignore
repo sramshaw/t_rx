@@ -1,0 +1,4 @@
+*.out.cpp
+*.out.hpp
+*.pyc
+*.swp
