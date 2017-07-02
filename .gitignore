@@ -2,4 +2,6 @@
 *.out.hpp
 *.pyc
 *.swp
+*.swo
+*.log
 *.exe

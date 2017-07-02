@@ -8,7 +8,7 @@ extern "C" {
 #include "source0.hpp"
 #include "../../include/trx.hpp"
 
-#define DEBUG               true
+#define DEBUG               false
 #define USAGE_TESTS         true
 #undef COMPILE_GENERATED
 #define PRINT_GENERATED_CODE false
@@ -77,7 +77,7 @@ void test_generated(){
       seq16.enable(c0);
 
       for(int j=0; j<1; j++){
-        for(int i=0; i<5; i++){
+        for(int i=0; i<100000; i++){
             if (DEBUG) std::cout << "********** new value incoming\n" << std::flush;
             (*source0_callback)(1+i);
         }
@@ -91,6 +91,7 @@ void test_generated(){
   auto time = end_time - start_time;
 
 
-  if (true) std::cout   << "\ndone\n"
+  if (true) std::cout   << "\ndone in time: \n"
+                        << std::chrono::duration_cast<std::chrono::microseconds>(time).count() << " microsecs\n\n"
                         << std::flush;
 }
