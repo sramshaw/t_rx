@@ -1,6 +1,6 @@
 #include <iostream>
 #include <array>
-#include "trx.hpp"
+#include "../../include/trx.hpp"
 //#define DEBUG true
 //////////////////////// TEST's SOURCE 0
 // 
@@ -41,7 +41,7 @@ static void source0_propagate_complete(){
     }
 }
 
-static void source0_subscribe(void(*next)(unsigned,void*),void(*complete)(void*), void* obj) {
+static void source0_sub(void(*next)(unsigned,void*),void(*complete)(void*), void* obj) {
      for(int i =0; i<source0_clients.size; i++){
         if (!source0_clients.enabled[i]) {
             source0_clients.next[i]      = next;
@@ -64,7 +64,7 @@ static void source0_stop(void* obj){
         }
     }
 }
-static void source0_dispose(void* obj){
+static void source0_disp(void* obj){
      for(int i =0; i<source0_clients.size; i++){
         if (source0_clients.obj[i] ==obj) {
             source0_clients.enabled[i] = false;

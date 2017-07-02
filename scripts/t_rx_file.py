@@ -1,7 +1,7 @@
 from subprocess import call
 from t_rx_operators import *
 from t_rx_parser import *
-import os
+import os, re
 
 # use of a tree for representation of nesting of elements in a separate list, nesting given by a rank
 # each leaf is an array such that : 
@@ -160,16 +160,27 @@ def getHpp(operators):
 def getCpp(operators,codeBefore,codeAfter,originalSequenceCode,hppname):
     rootOperator = operators[0]
     name = rootOperator.name
-    cpp = '#include "../../include/trx.hpp"\n#include "' + hppname + '"\n\n'
-    cpp = cpp + codeBefore + "/*" + originalSequenceCode + "*/\n  T_RX_CREATE_" + name + "()\n" + codeAfter
+    #cpp = '#include "../../include/trx.hpp"\n#include "' + hppname + '"\n\n'
+    cpp = codeBefore + "/*" + originalSequenceCode + "*/\n  T_RX_CREATE_" + name + "()\n" + codeAfter
     return cpp
 
 def generateCodeForOneFile(fullname):
     filename = fullname.replace(".t-rx.in.cpp","")
     hppname = filename + ".t-rx.out.hpp"
     cppname = filename + ".t-rx.out.cpp"
-    
+ 
     original = getContents(fullname)
+    includePattern = "(.*)([\/\\\\\\\"]trx\.hpp\")(.*)"
+    r = re.search(includePattern,original,re.DOTALL)
+    if not r:
+        print "[" + fullname + "]----------------------- does not contain any Rx"    
+        return
+    a = r.group(1)
+    b = r.group(2)
+    c = r.group(3)
+    original = a + b + "\n#include \"" + os.path.basename(hppname) + "\""+c
+    
+   
     print "[" + fullname + "]----------------------- PARSE"    
     patterns = getPatterns()
     operatorsFragments = getall(original,patterns)
@@ -183,7 +194,7 @@ def generateCodeForOneFile(fullname):
     print "[" + fullname + "]----------------------- ORGANIZE AS TREE"    
     tree = createTree(flat_data)
     print "[" + fullname + "]----------------------- OUTPUT"    
-    
+
     operators = getFinalOperators(tree)
     hpp = getHpp(operators)
     cpp = getCpp(operators, codeBefore,codeAfter,originalSequenceCode, os.path.basename(hppname))
