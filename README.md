@@ -30,6 +30,10 @@ Here we achieve shrinking by simplifying the sequences and observables at compil
 3. time sources handled as observables
 4. disposal by getting out of scope
 
+###Demo
+
+the demo can run by running `./run.sh`
+
 ### Notes
 this is currently tested with 
 
@@ -37,6 +41,6 @@ g++ v5.4.1
 
 python 2.7.12
 
-ubuntu 16.04
+bash and sh on ubuntu 16.04
 
     
