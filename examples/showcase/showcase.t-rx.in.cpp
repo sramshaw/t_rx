@@ -51,8 +51,6 @@ void tests(){
 
 void test_generated(){
   unsigned long c = 0;
-  if (DEBUG) std::cout  << "\nlibrary warm up, to make it as fair as possible: "
-                        << c;
 
   auto start_time = std::chrono::high_resolution_clock::now();
   {
