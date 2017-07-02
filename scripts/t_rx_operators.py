@@ -80,8 +80,8 @@ class fromJust:
         index   = index + 1
         self.external = ''
         self.common= (
-  '  inline void from_connect   (void (*n)('+arg1+',void*), void(*c)(void*), void* self){_exchange.type_%(i)d = ('+arg1+')('+arg2+');transform_next%(inci)d();transform_complete%(inci)d();}\n'
-  '  inline void from_disconnect(void (*n)('+arg1+',void*), void(*c)(void*), void* self){}\n'
+  '  inline void from_connect   (void (*n)(type0,void*), void(*c)(void*), void* self){_exchange.type_%(i)d = (type0)('+arg2+');transform_next%(inci)d();transform_complete%(inci)d();}\n'
+  '  inline void from_disconnect(void (*n)(type0,void*), void(*c)(void*), void* self){}\n'
   '  static void transform_next0(type%(i)d v%(i)d, void *obj) {}\n'
   '  static void transform_complete0(void *obj)       {}\n') %locals()
         self.straight=''

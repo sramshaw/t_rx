@@ -5,6 +5,7 @@ extern "C" {
 #include <fstream>
 #include <iostream>
 #include <chrono>
+#include "../../include/trx.hpp"
 
 #define DEBUG               true
 #define USAGE_TESTS         true
