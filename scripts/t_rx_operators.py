@@ -39,10 +39,10 @@ def create_class(name,capture,f_ops):
 
     ret = ret + "\n"+ "\n  ".join([o.trampoline for o in f_ops if hasattr(o,'trampoline')])
     ret = (ret+ "\n" 
-  "  inline void transform_next" + str(s) + "    () { (*this->exit_next)(_exchange.type_" + str(s-1) + ",this->exit_obj); }\n"
+  "  inline void transform_next" + str(s) + "    () { this->direct_exit_next(_exchange.type_" + str(s-1) + "); }\n"
   "  inline void transform_complete" + str(s) + "() {"
   "    disable();"
-  "    (*this->exit_complete)(this->exit_obj); "
+  "    this->direct_exit_complete(); "
   "  }\n};\n")
     return ret
 

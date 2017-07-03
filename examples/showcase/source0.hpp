@@ -12,7 +12,7 @@ static void (* source0_callback)(unsigned);
 static void (* source0_done)();
 
 
-/**/
+/*
 ///   THIS IS THE MOST COMPACT CODE FOR g++, 
 const int client_max = 5; // 10;
 
@@ -135,10 +135,10 @@ static void stop(void* obj){
 
 /*
 */
-/*
 
+#define DEBUG false
 /// THIRD PLACE
-const int client_max = 2; // 10;
+const int client_max = 5; // 10;
 
 inline static void _source0_subscribe(void(*next)(unsigned,void*),void(*complete)(void*), void* obj) ;
 
@@ -158,8 +158,8 @@ public:
         if (self->source0_clients.enabled[i]) {
             (*self->source0_clients.next[i])(val,self->source0_clients.obj[i]);
         }
+      }
     }
-}
 
     static void oncomplete(void* me){
         auto self = static_cast<source0*> (me);
@@ -167,8 +167,8 @@ public:
         if (self->source0_clients.enabled[i]) {
             (*self->source0_clients.complete[i])(self->source0_clients.obj[i]);
         }
+      }
     }
-}
     
     void subscribe(void(*next)(unsigned,void*),void(*complete)(void*), void* obj) {
       for(int i =0; i<source0_clients.size; i++){
@@ -181,9 +181,9 @@ public:
             if (DEBUG) std::cout << "[SOURCE] 0 > registered client " << (i+1) << "\n" << std::flush;
             return;
         }
-    }
-    if (DEBUG) std::cout << "[SOURCE] 0 > source0 could not register a client\n" << std::flush;
-} 
+      }
+      if (DEBUG) std::cout << "[SOURCE] 0 > source0 could not register a client\n" << std::flush;
+    } 
 
     void dispose(void* obj){
       for(int i =0; i<source0_clients.size; i++){
@@ -191,8 +191,8 @@ public:
             source0_clients.enabled[i] = false;
             if (DEBUG) std::cout << "[SOURCE] 0 > source0 unregistered client " <<  (i+1) << "\n" << std::flush;
         }
-    }
-} 
+      }
+    } 
 };
 
 static source0 s0;
@@ -208,10 +208,13 @@ inline static void _source0_subscribe(void(*next)(unsigned,void*),void(*complete
             source0_done    = &_s0_complete;
 }
 
-inline static void source0_subscribe(void(*next)(unsigned,void*),void(*complete)(void*), void* obj) {
+inline static void source0_sub(void(*next)(unsigned,void*),void(*complete)(void*), void* obj) {
     s0.subscribe(next,complete,obj);
 }
 inline static void source0_stop(void* obj){
+    s0.dispose(obj);
+}
+inline static void source0_disp(void* obj){
     s0.dispose(obj);
 }
 
