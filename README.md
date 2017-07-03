@@ -15,8 +15,7 @@ Having focused on small C systems for the better part of a decade, then having p
 4. [G4] Light weight implementation of operators, and where not possible: it will not be implemented (go to RxCpp for that)
 
 ### Targetted systems
-The project aims at small programs running on micro processors, say for instance a 16bit processor with 64KB of program space. There is no desire to provide support for multithreading, multithreading should be added by the developer 
-From there, it may also naturally carry over to single threaded apply 
+The project aims at small programs running on micro processors, say for instance a 16bit processor with 64KB of program space. The main behavior will remain single core and single threaded.
 
 ### Architecture
 The main contribution required to make event handling palatable to small systems is a brutal shrinking of the executable. RxCpp will take most likely a minimum of 300KB for a basic implementation, for instance look at the pythagorian example. 
