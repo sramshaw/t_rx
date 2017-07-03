@@ -1,7 +1,8 @@
 import re
 
 def no_capture(mask):       # for regex
-    return mask.replace(')','').replace('(','')
+    return mask.replace('\)','close_parenthesis').replace('\(','open_parenthesis').replace(')','').replace('(','').replace('close_parenthesis','\)').replace('open_parenthesis','\(')
+
 
 def getPatterns():
     return "(.*)(" + "|".join([no_capture(o[1]) for o in getRxGrammar()])  + ")(.*)"
@@ -43,6 +44,14 @@ def getRxGrammar():
         "sequence\s*(\w+)\s*=\s*\[(\w*)\]\s*=>",
         "",
         "namedSequence(op,a(1),a(2))"],
+    [   "scan0",
+        'scan\s+(\w+)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*\{',
+        "(.*)\}\s*",
+        "scan(op,name,captype,capture,'{return ' + a(1) +';}',a(2),a(3),'{' + b(1) +'}')"], 
+    [   "scan1",
+        'scan\s+(\w+)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>',
+        "(.*)\s*",
+        "scan(op,name,captype,capture,'{return ' + a(1) +';}',a(2),a(3),'{return ' + b(1) +';}')"], 
     [   "selectmany",
         'selectmany\s+(\w+)\s*,\s*\[\s*(\w*)\]\s*=>',
         "",

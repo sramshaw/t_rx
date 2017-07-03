@@ -123,6 +123,33 @@ def expand_anon_types(s):
         return ret
     return s
 
+class scan:
+    def __init__(self, op, name, captype,capture, init,acc,n, funcBody):
+        index = op[3]
+        transformed      = expand_anon_types(funcBody)
+        transformed_init = expand_anon_types(init)
+        print op[4][2]
+        #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
+        i       = index
+        deci    = i+1
+        index   = index + 1
+        funcName        = "%(name)s_fs%(i)d" %locals() 
+        deci            = i-1
+        inci            = i+1
+        self.external   = ('template<typename _c0> auto %(funcName)s_init (_c0 %(capture)s)%(transformed_init)s\n' 
+                           'template<typename _c0, typename type%(deci)d, typename type%(i)d> auto %(funcName)s (_c0 %(capture)s, type%(deci)d %(n)s,type%(i)d %(acc)s)%(transformed)s\n' 
+                          )% locals()
+        self.straight   =''
+        self.trampoline =(
+    'inline void transform_next%(i)d()     { %(acc)s = %(funcName)s(%(capture)s,_exchange.type_%(deci)d,%(acc)s); transform_next%(inci)d(); _exchange.type_%(i)d = %(acc)s; }\n'
+  '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }\n'
+  '  type%(i)d %(acc)s;\n'
+  "  inline void init_scan%(i)d()   { %(acc)s = %(funcName)s_init (%(capture)s);}\n"
+            ) %locals()
+        self.outputType =('typedef decltype(%(funcName)s_init<%(captype)s>(%(captype)s{})) ' + name + '_type%(i)d;') %locals()
+        self.internal_setup = 'init_scan' + str(i) + "();"
+        self.index=i
+
 class select:
     def __init__(self, op, name, captype,capture, var, funcBody):
         index = op[3]

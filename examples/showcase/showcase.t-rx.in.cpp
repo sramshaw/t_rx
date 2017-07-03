@@ -57,6 +57,7 @@ void test_generated(){
       auto c0= &c;
 
       sequence seq16 = [c0] => fromStaticPublisher<unsigned> (source0_sub, source0_disp)
+          scan 0, (acc,n) => acc++ 
           select x => { return (short) x *2 ;}
           select x => { return { c = (short) x *2}; }
           select x => x.c

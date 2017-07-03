@@ -56,7 +56,7 @@ void test_generated(){
   auto start_time = std::chrono::high_resolution_clock::now();
   {
       auto c0= &c;
-      sequence seq14 = [c0] => fromRange<unsigned>(1,1000)
+      sequence seq14 = [c0] => fromRange<unsigned>(1,999)
           select z1 => struct {z = z1, c = c0}
           selectmany 1, [azc] => fromRange<unsigned>(1, azc.z)
                   select x => struct {z = azc.z, x = x, c = azc.c}
@@ -67,7 +67,7 @@ void test_generated(){
                         endObservable
                   endObservable
           select a => a.z
-          take 101
+          take 100
           endObservable
           ;
 
