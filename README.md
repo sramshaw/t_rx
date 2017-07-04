@@ -42,4 +42,4 @@ python 2.7.12
 
 bash and sh on ubuntu 16.04
 
-    
+clang-format version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)   
