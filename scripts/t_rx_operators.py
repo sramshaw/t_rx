@@ -17,7 +17,9 @@ def create_class(name,capture,f_ops):
               ) + ">\n")
     ret =(ret + 'class ' + name + ':public observable<type' + str(s-1) + '>{\npublic:\n  _c0 ' + capture +';'
               + '\n  typedef type' + str(s-1) + " output;"
-              + "\n  bool enable(_c0 a0) {this->enabled = true; "+capture+"=a0; from_connect   (&transform_next0, &transform_complete0, this); return true;}"
+              + "\n  bool enable(_c0 a0) {this->enabled = true; "+capture+"=a0;" 
+              + "\n  ".join([ o.internal_enable for i,o in enumerate(f_ops) if hasattr(o,'internal_enable')])
+              + "\n   from_connect   (&transform_next0, &transform_complete0, this); return true;}"
               + "\n  void disable()      {"
               + "\n    //std::cout<<\"disable " + name + "\\n\"<<std::flush;"
               + "\n    from_disconnect(&transform_next0, &transform_complete0, this);"
@@ -141,13 +143,13 @@ class scan:
                           )% locals()
         self.straight   =''
         self.trampoline =(
-    'inline void transform_next%(i)d()     { %(acc)s = %(funcName)s(%(capture)s,_exchange.type_%(deci)d,%(acc)s); transform_next%(inci)d(); _exchange.type_%(i)d = %(acc)s; }\n'
+    'inline void transform_next%(i)d()     { %(acc)s = %(funcName)s(%(capture)s,_exchange.type_%(deci)d,%(acc)s); _exchange.type_%(i)d = %(acc)s; transform_next%(inci)d(); }\n'
   '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }\n'
   '  type%(i)d %(acc)s;\n'
   "  inline void init_scan%(i)d()   { %(acc)s = %(funcName)s_init (%(capture)s);}\n"
             ) %locals()
         self.outputType =('typedef decltype(%(funcName)s_init<%(captype)s>(%(captype)s{})) ' + name + '_type%(i)d;') %locals()
-        self.internal_setup = 'init_scan' + str(i) + "();"
+        self.internal_enable = 'init_scan' + str(i) + "();"
         self.index=i
 
 class select:

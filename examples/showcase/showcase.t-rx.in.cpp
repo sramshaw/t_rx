@@ -5,13 +5,11 @@ extern "C" {
 #include <fstream>
 #include <iostream>
 #include <chrono>
-#include "source0.hpp"
+#include "tick1.hpp"
 #include "../../include/trx.hpp"
 
+
 #define DEBUG               false
-#define USAGE_TESTS         true
-#undef COMPILE_GENERATED
-#define PRINT_GENERATED_CODE false
 
 static void nothing(){}
 void tests();
@@ -22,52 +20,43 @@ int main(){
 
 ///////////////////////// GENERATED CODE UTILITIES
 // utils for visualizing the code generated
-template<typename t>
-static void n_trace(t n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n << "\n" << std::flush;}
+static void n_trace(long n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n << "\n" << std::flush;}
 static void c_trace(void* obj)      {if (DEBUG) std::cout << "[TRACE] seq > completed\n" << std::flush;  }
-
-class observer { // not sure this is necessary yet
-public:
-    static void n_trace(short n)  {if (DEBUG) std::cout << "seq2 output " << n << "\n" << std::flush;}
-    static void c_trace()         {if (DEBUG) std::cout << "seq2 completed\n" << std::flush;  }
-};
 
 ///////////////////////// TESTS
 void test_generated();
 void tests(){
     if (DEBUG) std::cout << "\n\n//// START OF TESTS /////\n";
-    if (USAGE_TESTS == true)
     {
     	test_generated();
         if (DEBUG) std::cout << "************* end test ************\n" << std::flush;
     }
-    else
-    {
-        source0_sub(n_trace,c_trace,nullptr);
-        (*source0_callback)(1);
-        source0_stop(nullptr);
-    }
 }
 
+
 void test_generated(){
-  unsigned long c = 0;
+  struct { long v; long total; } c;
+  c.v= 0;
+  c.total = 0;
 
   auto start_time = std::chrono::high_resolution_clock::now();
   {
-      auto c0= &c;
+      auto c0= c;
 
-      sequence seq16 = [c0] => fromStaticPublisher<unsigned> (source0_sub, source0_disp)
-          scan 0, (acc,n) => acc++ 
-          select x => { return (short) x *2 ;}
-          select x => { return { c = (short) x *2}; }
+      std::cout << "value in sequence c0: " << c0.total << "\n" << std::flush;
+      sequence seq16 = [c0] => fromPublisher<unsigned> (tick1)
+          scan c0, (acc,n) => { acc.total++;  return acc;  }
+          select x => x.total
+          select x => { return x *1 ;}
+          select x => { return { c =  x +0}; }
           select x => x.c
-          select x => (short)x +2
+          select x => (long)x + 0
           select x => struct { a = x, b = 1}
           selectmany 3, [x] => fromCapture()
-                select y => y.a+2
+                select y => y.a + 0
                 select y => y*x.b
                 endObservable
-          select x => x-1
+          select x => (x + 0)
           endObservable
           ;
 
@@ -76,12 +65,12 @@ void test_generated(){
       seq16.enable(c0);
 
       for(int j=0; j<1; j++){
-        for(int i=0; i<100000; i++){
+        for(int i=0; i<10; i++){
             if (DEBUG) std::cout << "********** new value incoming\n" << std::flush;
-            (*source0_callback)(1+i);
+            interface_tick1::onnext(1+i);
         }
         if (DEBUG) std::cout << "last element was sent by source 0, now complete\n" << std::flush;
-        (*source0_done)();
+        interface_tick1::oncomplete();
       }
       
       seq16.disable();

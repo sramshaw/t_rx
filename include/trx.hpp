@@ -61,6 +61,7 @@ public:
 
 const int publish_max = 5; // 10;
 
+#define DEBUG               false
 template<typename typeN>
 class publishedObservable : public rx_usable {
  struct { 
@@ -72,12 +73,15 @@ class publishedObservable : public rx_usable {
 } _clients;
 
 public:
+//clients_t<typeN> _clients;
+
     inline void direct_exit_next(typeN val) {
        for(int i =0; i<_clients.size; i++){
           if (_clients.enabled[i]) {
               (*_clients.next[i])(val,_clients.obj[i]);
           }
         }
+        if (DEBUG) std::cout << "[SOURCE] 0 > next val " << (val) << "\n" << std::flush;
     }
     inline void direct_exit_complete() {
      for(int i =0; i<_clients.size; i++){
@@ -94,20 +98,20 @@ public:
             _clients.complete[i]  = complete;
             _clients.obj[i]       = obj;
             _clients.enabled[i]   = true;
-            this->exit_object   = this;
+            //this->exit_object   = this;
             //_source0_subscribe( &onnext, &oncomplete,this);
-            //if (DEBUG) std::cout << "[SOURCE] 0 > registered client " << (i+1) << "\n" << std::flush;
+            if (DEBUG) std::cout << "[SOURCE] 0 > registered client " << (i+1) << "\n" << std::flush;
             return;
         }
       }
-      //if (DEBUG) std::cout << "[SOURCE] 0 > source0 could not register a client\n" << std::flush;
+      if (DEBUG) std::cout << "[SOURCE] 0 > source0 could not register a client\n" << std::flush;
     } 
 
     void dispose(void* obj){
       for(int i =0; i<_clients.size; i++){
         if (_clients.obj[i] ==obj) {
             _clients.enabled[i] = false;
-            //if (DEBUG) std::cout << "[SOURCE] 0 > source0 unregistered client " <<  (i+1) << "\n" << std::flush;
+            if (DEBUG) std::cout << "[SOURCE] 0 > source0 unregistered client " <<  (i+1) << "\n" << std::flush;
         }
       }
     } 
