@@ -1,8 +1,8 @@
 ## [ti-re:ks] The tiny C/C++ Rx implementation
 ### Foreword
-T_rx or tirnsr_rx is a nail bitingly crushing version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It plows through source code with its super sharp operator implementations, leaving you with bare bone programs.
+T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It offers a flatmap and fluent way to combine lambdas. All memory is reserved on the stack, nothing on the heap.
 
-Its egg travelled from a time where programs fit on 32kB, and the word on the street since it hatched is: it wants to go back there, beware!
+This is aiming at programs that need to fit on 32kB (Ex: single Parallela core).
  
 ReactiveX [Rx] is a powerful language that can change, where applicable, the way we code event based systems. It can and has been used in place of what would have been accomplished via small interpreters and/or state machines.
 
@@ -31,15 +31,28 @@ Here we achieve shrinking by simplifying the sequences and observables at compil
 
 ###Demo
 
-the demo can run by running `./run.sh`
+the demo can run by running `./build_and_run.sh`
 
 ### Notes
-this is currently tested with 
+by running ```./versions.sh``` in the container as per ```./build_and_explore.sh```, here is the snapshot of the versions seen during a successful execution: 
 
-g++ v5.4.1
+```shell
+$ g++ --version
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
+Copyright (C) 2023 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-python 2.7.12
 
-bash and sh on ubuntu 16.04
+$ python3 --version
+Python 3.12.3
 
-clang-format version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)   
+$ cat /etc/lsb-release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=24.04
+DISTRIB_CODENAME=noble
+DISTRIB_DESCRIPTION="Ubuntu 24.04.1 LTS"
+
+$ clang-format --version
+Ubuntu clang-format version 18.1.3 (1ubuntu1)
+```
