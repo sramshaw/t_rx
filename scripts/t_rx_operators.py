@@ -50,7 +50,7 @@ def create_class(name,capture,f_ops):
 
 class fromStaticPublisher:
     def __init__(self,op,arg2,f1,f2,seq_name,captype,capture):
-        print op[4][2]
+        print(op[4][2])
         index = op[3]
         i       = index
         inci    = i + 1
@@ -75,7 +75,7 @@ class fromStaticPublisher:
 
 class fromJust:
     def __init__(self, op, arg1, arg2, seq_name, captype, capture):
-        print op[4][2]
+        print(op[4][2])
         index = op[3]
         i       = index
         inci    = i + 1
@@ -93,7 +93,7 @@ class fromJust:
 
 class fromRange:
     def __init__(self, op, theType, arg1,arg2, seq_name, captype, capture):
-        print op[4][2]
+        print(op[4][2])
         index = op[3]
         i       = index
         inci    = i + 1
@@ -112,7 +112,7 @@ class fromRange:
 
 def expand_anon_types(s):
     match =re.findall(r"(return)[\s\n\r]*\{[\n\s\r]*(.+)[\s\n\r]*}[/n/s]*;[\n\s\r]*",s,re.DOTALL)
-    print match
+    print(match)
     if match:
         t = match[0][1]
         u = re.findall(r"\s*(\w+)?\s*=\s*([^,]+)?,?\s*",t,re.DOTALL)
@@ -130,7 +130,7 @@ class scan:
         index = op[3]
         transformed      = expand_anon_types(funcBody)
         transformed_init = expand_anon_types(init)
-        print op[4][2]
+        print(op[4][2])
         #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
         i       = index
         deci    = i+1
@@ -156,7 +156,7 @@ class select:
     def __init__(self, op, name, captype,capture, var, funcBody):
         index = op[3]
         transformed = expand_anon_types(funcBody)
-        print op[4][2]
+        print(op[4][2])
         #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
         i       = index
         deci    = i+1
@@ -177,7 +177,7 @@ class where:
     def __init__(self, op, name, captype,capture, var, funcBody):
         index = op[3]
         transformed = expand_anon_types(funcBody)
-        print op[4][2]
+        print(op[4][2])
         #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
         i       = index
         deci    = i+1
@@ -198,7 +198,7 @@ class do:
     def __init__(self, op, name, captype,capture, var, funcBody):
         index = op[3]
         transformed = expand_anon_types(funcBody)
-        print op[4][2]
+        print(op[4][2])
         #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
         i       = index
         deci    = i+1
@@ -218,7 +218,7 @@ class do:
 class take:
     def __init__(self, op, name, captype,capture, count):
         index = op[3]
-        print op[4][2]
+        print(op[4][2])
         i       = index
         deci    = i+1
         index   = index + 1
@@ -236,7 +236,7 @@ class take:
 
 class selectmany:
     def __init__(self, op, name, maxConcurrent, var): #, subseq):
-        print op[4][2]
+        print(op[4][2])
         index = op[3]
         i = index
         deci            = i - 1
@@ -278,7 +278,7 @@ class selectmany:
 class endSequence:
     def __init__(self, op,name):
         index = op[3]
-        print op[4][2]
+        print(op[4][2])
         i = index
         deci = i + 1
         index = index + 1
@@ -299,7 +299,7 @@ class endNamedSequence:
 
 class namedSequence:
     def __init__(self,op,name,capture):
-        print op[4][2]
+        print(op[4][2])
         index = op[3]
         i = index
         self.name     = name

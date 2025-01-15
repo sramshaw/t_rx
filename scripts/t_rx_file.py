@@ -33,7 +33,7 @@ def countRank(op):
         rank = rank +1
     if op == 'endSequence':
         rank = rank -1
-    print rank,op
+    print(rank,op)
     return i
 def increment():
     global id
@@ -46,9 +46,9 @@ def codeFragments(operatorsFragments,original):
     codeBefore = a[0][0]
     codeAfter = a[len(a)-1][2]
     whole  = codeBefore + originalSequenceCode + codeAfter
-    print originalSequenceCode
+    print(originalSequenceCode)
 
-    print "are all parts equal to the whole?  " + str(whole == original)
+    print("are all parts equal to the whole?  " + str(whole == original))
     return [codeBefore,originalSequenceCode,codeAfter]
 
 def createFlatElement(parsedElement,rx_grammar):
@@ -88,7 +88,7 @@ def createTree(flat_data):
     rank0 = 0
     tree  = [createTreeBranch(getId(o), noId, getFlatElementRank(o), rank0, o) for o in flat_data if getFlatElementRank(o) == rank0] 
     c     = [o for o in flat_data if getFlatElementRank(o) > rank0]
-    print tree
+    print(tree)
     for o in c:
         previous  = findById(tree, getId(o)-1)
         parent    = previous             # default case: previous is the parent
@@ -142,10 +142,10 @@ def getHpp(operators):
     rootOperator = operators[0]
     print('\n\n\n\n\n')
     print('####################')
-    print rootOperator
+    print(rootOperator)
     print('####----------------')
     name = rootOperator.name
-    ret = "#include <functional>"
+    ret = "#include <functional>\n#include <array>"
     ret = ret + getStandaloneDeclarations(rootOperator.ops)
     ret = ret + rootOperator.class_definition
     ret = ret + "\n\n #define T_RX_CREATE_" + name + "() \\\n"
@@ -173,7 +173,7 @@ def generateCodeForOneFile(fullname):
     includePattern = "(.*)([\/\\\\\\\"]trx\.hpp\")(.*)"
     r = re.search(includePattern,original,re.DOTALL)
     if not r:
-        print "[" + fullname + "]----------------------- does not contain any Rx"    
+        print("[" + fullname + "]----------------------- does not contain any Rx")    
         return
     a = r.group(1)
     b = r.group(2)
@@ -181,19 +181,19 @@ def generateCodeForOneFile(fullname):
     original = a + b + "\n#include \"" + os.path.basename(hppname) + "\""+c
     
    
-    print "[" + fullname + "]----------------------- PARSE"    
+    print("[" + fullname + "]----------------------- PARSE")    
     patterns = getPatterns()
     operatorsFragments = getall(original,patterns)
-    print "[" + fullname + "]----------------------- GROUP"    
+    print("[" + fullname + "]----------------------- GROUP")    
     [codeBefore,originalSequenceCode,codeAfter] = codeFragments(operatorsFragments,original)
-    print "[" + fullname + "]----------------------- ENRICH"    
+    print("[" + fullname + "]----------------------- ENRICH")    
     reset() # for increment and countRank used for createFlatElement 
     rx_grammar = getRxGrammar()
     flat_data = [createFlatElement(o,rx_grammar) for o in operatorsFragments if len(identifiedFull(o[1],rx_grammar))>2]
-    print flat_data
-    print "[" + fullname + "]----------------------- ORGANIZE AS TREE"    
+    print(flat_data)
+    print("[" + fullname + "]----------------------- ORGANIZE AS TREE")    
     tree = createTree(flat_data)
-    print "[" + fullname + "]----------------------- OUTPUT"    
+    print("[" + fullname + "]----------------------- OUTPUT")    
 
     operators = getFinalOperators(tree)
     hpp = getHpp(operators)
