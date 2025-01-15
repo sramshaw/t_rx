@@ -1,5 +1,5 @@
 #rm main1
-#echo '\n\n\n\n////////////////////  START GENERATION main1 //////////////////'
+#echo '\n\n\n\n////////////////////  COMPILING main1 //////////////////'
 # wasteful version, to compare to RxCpp
 #g++ -std=c++14  -O2 -s -DNDEBUG pythagorian.cpp -o main1  && size main1 && ./main1
 # efficient one to stay below 32KB
@@ -9,7 +9,7 @@
 #size main1 && ./main1 | c++filt -t
 
 rm pythagorian.exe
-echo '\n\n\n\n////////////////////  START GENERATION pythagorian //////////////////' 
+echo '\n\n\n\n////////////////////  COMPILING pythagorian //////////////////' 
 #g++ -std=c++14 -I . -Os -fdata-sections -ffunction-sections pythagorian.t-rx.out.cpp -Wunused-result -o pythagorian -Wl,--gc-sections 2>&1 | grep error 
 g++ -std=c++14 -I . -Os -fdata-sections -ffunction-sections pythagorian.t-rx.out.cpp -Wunused-result -o pythagorian.exe -Wl,--gc-sections 2>&1 | grep error 
 #g++ -S -masm=intel -std=c++14 -I . -Os -fdata-sections -ffunction-sections pythagorian.t-rx.out.cpp -Wunused-result -o pythagorian.s -Wl,--gc-sections 2>&1 | grep error 
