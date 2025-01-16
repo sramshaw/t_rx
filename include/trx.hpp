@@ -46,6 +46,13 @@ public:
         //if (DEBUG) std::cout << "FAIL STARTING subseq for value of x: " /*<< x*/ << " \n" << std::flush;
         return false;
     };
+    void disableFrom(void* caller) {
+        for(auto& element: repo) {
+            if (element.exit_obj==caller) {
+                return element.disable();
+            }
+        }
+    };
     void unbind () {
         for(auto& element: repo)
             if (element.enabled)   element.disable();

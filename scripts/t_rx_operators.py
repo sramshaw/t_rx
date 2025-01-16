@@ -41,9 +41,10 @@ def create_class(name,capture,f_ops):
 
     ret = ret + "\n"+ "\n  ".join([o.trampoline for o in f_ops if hasattr(o,'trampoline')])
     ret = (ret+ "\n" 
+  "  // end of sequence logic\n"
   "  inline void transform_next" + str(s) + "    () { this->direct_exit_next(_exchange.type_" + str(s-1) + "); }\n"
   "  inline void transform_complete" + str(s) + "() {"
-  "    disable();"
+  "/*auto dispose*/    disable();"
   "    this->direct_exit_complete(); "
   "  }\n};\n")
     return ret
@@ -228,7 +229,7 @@ class take:
         self.straight   =''
         self.trampoline =(
   "  decltype(" + count + ") counter%(i)d = 0;\n"
-  'inline void transform_next%(i)d()     { counter%(i)d++; transform_next%(inci)d(); if (counter%(i)d >= ' + count + ') {transform_complete%(inci)d(); std::cout<<"was here"; }}\n'
+  'inline void transform_next%(i)d()     { counter%(i)d++; transform_next%(inci)d(); if (counter%(i)d >= ' + count + ') {transform_complete%(i)d(); std::cout<<"was here"; }}\n'
   '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }'
             ) %locals()
         self.outputType =('typedef ' + name + '_type%(deci)d ' + name + '_type%(i)d;') %locals()
@@ -250,7 +251,7 @@ class selectmany:
         inci            = i + 1
         deci            = i - 1
         self.external   = ''
-        self.ondisable = "m%(i)d.unbind();" %locals()
+        self.ondisable = "\n    m%(i)d.disableFrom(this);" %locals()
         self.trampoline =   (
   "  decltype(" + maxConcurrent + ") counter%(i)d;\n"
   "  bool bool%(i)d;\n"

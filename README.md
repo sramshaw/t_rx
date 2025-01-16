@@ -303,14 +303,12 @@ seq14_sub -> seq14_sub : set capture value passed as arg
 seq14_sub -> seq14_sub : try an external provider \n(nothing in fromconnect would pull \nfrom a buffer)
 ' note that for background task to try later, would be best to hit fromconnect as long as enabled, and avoid set enabled and set capture.
 seq14_sub -> seq14_sub : for loop logic starts\npushing integers to transform_next1
-seq14_sub -> seq14_sub : select logic
-seq14_sub -> seq14_sub : transform_next1 applies seq14_fs1\n(_c0 azcx, type0 y)\n=>{ (*azcx.c)++; return azcx.x*azcx.x + y*y == azcx.z*azcx.z; }
-seq14_sub -> seq14_sub : select logic\ntransform_next1 enters transform_next2
+seq14_sub -> seq14_sub : select logic\n transform_next1 applies seq14_fs1\n z1 => struct {z = z1, c = c0}
 activate seq14_sub
-seq14_sub -> seq14_sub : selectmany logic\ntry to assign work to subsequence
+seq14_sub -> seq14_sub : selectmany logic\n try to assign work to subsequence
 seq14_sub -> seq_14_manager2 : success =assignwork(for_capture, this)
 
-seq_14_manager2 -> seq14_sequence2_array : get iterator => foreach
+seq_14_manager2 -> seq14_sequence2_array : get iterator => foreach element
 seq_14_manager2 -> seq_14_manager2 : if element.enabled==false, then
 seq_14_manager2 -> seq14_sequence2_array.n : element.exit_obj=caller
 'note: should above be passed in enabler?
@@ -318,15 +316,51 @@ seq_14_manager2 -> seq14_sequence2_array.n : ret = enable(captured)
 seq14_sequence2_array.n -> seq14_sequence2_array.n : same logic
 'same logic within for seq14_sequence2_array.n.enable,
 ' and again within 
+seq14_sequence2_array.n -> seq14_sub : static receive_next(v2, self) { self->state=v2;}
+seq14_sub -> seq14_sub : select logic\n transform_next3 applies seq14_fs3\n a => a.z
+seq14_sub -> seq14_sub : take logic\n x=> { counter4++; &n_trace(x); if (counter4 >=  100) {stop()}
+seq14_sub -> seq14_sub : stop: oncomplete => dispose
+activate seq14_sub
+seq14_sub -> seq14_sub : disable();
+activate seq14_sub
+seq14_sub -> seq14_sub : enable = false;
+seq14_sub -> seq14_sub : enable = false;
+seq14_sub -> seq_14_manager2 : disableFrom(this)
+seq_14_manager2 -> seq14_sequence2_array : get iterator\nforeach element
+seq_14_manager2 -> seq14_sequence2_array.n : if (element.exitObject == caller)
+seq_14_manager2 -> seq14_sequence2_array.n : element.disable()
+seq_14_manager2 -> seq14_sub
+deactivate seq14_sub
+deactivate seq14_sub
 
-seq_14_manager2 -> seq14_ssub : return ret or 'no element => false'
+seq14_sub -> seq14_sub
+seq14_sub -> seq14_sequence2_array.n
+seq14_sequence2_array.n -> seq_14_manager2: return true
+' need o revisit the dispose() story. is the completed from top observable propagating down: .
+' transform_next2 probably needs to call transform_complete2() if !this->enabled,
+'  transform_complete2 should call manager.unbind ()
+' transform_next4 should have a bool to prevent a double transform_complete4
+' transform_complete4() to call transform_complete5()
+
+
+seq_14_manager2 -> seq14_sub : return ret or 'no element => false'
 
 ' seems below is for tracing?
 seq14_sub -> seq14_sub : if success counter2++
-stack -> seq14_sub : disable()
+seq14_sub -> stack 
+deactivate seq14_sub
 
-stack -> stack : out of scope cleanup
+stack -> seq14_sub : disable() // already done - not drawing again
 
+stack -> stack : out of scope => stack cleanup
+deactivate stack
+deactivate stack
+deactivate stack
+deactivate stack
+deactivate stack
+deactivate stack
+deactivate stack
+deactivate stack
 @enduml
 
 ```
