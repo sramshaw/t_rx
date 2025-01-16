@@ -28,43 +28,6 @@ class observable: public rx_usable {
         (*exit_complete)(exit_obj);    
     }
 };
-template<typename repo_t, typename origin,typename witness>
-class high_order_manager {
-private:
-    repo_t   repo;
-public:
-    bool assign_work(origin x, void* caller) {
-        auto i =0;
-        for(auto& element: repo) {
-            if (!element.enabled) {
-                element.exit_obj=caller;
-                //std::cout << "assign work @"<<i<<" \n" << std::flush;
-                return element.enable(x);
-            }
-            i++;
-        }
-        //if (DEBUG) std::cout << "FAIL STARTING subseq for value of x: " /*<< x*/ << " \n" << std::flush;
-        return false;
-    };
-    void disableFrom(void* caller) {
-        for(auto& element: repo) {
-            if (element.exit_obj==caller) {
-                return element.disable();
-            }
-        }
-    };
-    void unbind () {
-        for(auto& element: repo)
-            if (element.enabled)   element.disable();
-    };
-    void bind(void (*n)(witness,void*), void(*c)(void*), void* self) {
-        //if (DEBUG) std::cout << "binding seqs!! \n" << std::flush;
-        for(auto& element: repo)
-            element.subscribe(n,c,self);
-    };
-    high_order_manager(repo_t r): repo(r){} 
-};
-
 
 const int publish_max = 5; // 10;
 
