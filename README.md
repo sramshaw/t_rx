@@ -18,7 +18,8 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [Status : in construction](#status--in-construction)
   - [Notes](#notes)
     - [uml diagram using plantuml plugin](#uml-diagram-using-plantuml-plugin)
-    - [versions](#versions)
+    - [tooling versions](#tooling-versions)
+  - [release notes](#release-notes)
   - [design](#design)
 
 
@@ -65,7 +66,7 @@ it did not work for me until I installed on WSL: ```sudo apt install openjdk-21-
 extensions used: [listed here](./.vscode/extensions.json)
 
 
-#### versions
+#### tooling versions
 by running ```./versions.sh``` in the container as per ```./build_and_explore.sh```, here is the snapshot of the versions seen during a successful execution: 
 
 ```shell
@@ -89,6 +90,24 @@ $ clang-format --version
 Ubuntu clang-format version 18.1.3 (1ubuntu1)
 ```
 
+### release notes
+- the original design has the following decomposition of features:
+  - sequence class that
+    - concatenates most of the operators using a union variable to hold the transformed values over time
+    - branches out values to sub sequences as needed for selectmany (aka flatmap)
+  - foreach selectmany operator, a manager class that handles a pool (std::array) of sub-sequences
+    - binds the sub- sequences to the main sequence, and also
+    - initiates immediate inits with assign_work
+    - ultimately disposes (aka disables in the case of the pool approach) the sub
+- this version here now merges the managers within the sequence owning the corresponding selectmany logic
+  - this reduces the number of indirections
+    - seen by smaller binary:
+    >-rwxr-xr-x 1 root   root   18840 Jan 16 23:28 pythagorian.exe.original
+    -rwxr-xr-x 1 root   root   18592 Jan 16 23:27 pythagorian.exe.merge_binding_to_sequence  
+    - we can see that ~250 bytes are spared by this, explained by more inlining
+  - note that it is possible to abstract more parts of the system to have a manager that is more generic, and therefore reusable when the templates are redundant
+    - this is no likely though, and still requires more execution
+  
 
 ### design
 
