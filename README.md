@@ -305,7 +305,6 @@ seq14_sub -> seq14_sub : try an external provider \n(nothing in fromconnect woul
 seq14_sub -> seq14_sub : for loop logic starts\npushing integers to transform_next1
 seq14_sub -> seq14_sub : select logic
 seq14_sub -> seq14_sub : transform_next1 applies seq14_fs1\n(_c0 azcx, type0 y)\n=>{ (*azcx.c)++; return azcx.x*azcx.x + y*y == azcx.z*azcx.z; }
-seq14_sub -> seq14_sub : transform_next1 applies seq14_fs1\n(_c0 azcx, type0 y)\n=>{ (*azcx.c)++; return azcx.x*azcx.x + y*y == azcx.z*azcx.z; }
 seq14_sub -> seq14_sub : select logic\ntransform_next1 enters transform_next2
 activate seq14_sub
 seq14_sub -> seq14_sub : selectmany logic\ntry to assign work to subsequence
