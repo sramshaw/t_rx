@@ -1,1 +1,5 @@
-when-changed -v1s include/trx.hpp examples/showcase/source0.hpp scripts/tirnsr_rx.py scripts/t_rx_file.py scripts/t_rx_operators.py scripts/t_rx_parser.py examples/pythagorian/pythagorian.t-rx.in.cpp examples/showcase/showcase.t-rx.in.cpp -c './run.sh'
+./run.sh
+while fswatch -1 --event=Updated -r examples scripts include  ; do
+    ./run.sh
+    sleep 2
+done
