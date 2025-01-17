@@ -115,7 +115,7 @@ def generateTypes_i_o(i,o,name):
         sub = generateTypes(name+ "_" + str(i), o.ops, name+"_type"+str(i-1))
         ret = ret + sub[0]
         array = "\nstd::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+"_sequence"+str(i)+"_array={"+",".join(["[_creator_]" for j in range(0, int(o.maxConcurrent))])+"};"
-        array_type = "\ntypedef std::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+ "_" + str(i)+"_sub_array;"
+        array_type = "\ntypedef std::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+ "_" + str(i)+"_sub_array_type;"
         ret = ret + array.replace('[_creator_]',sub[1])
         ret += array_type;
     #print o
@@ -125,7 +125,7 @@ def generateTypes(name, operators, parent_type):
     ret = "".join([generateTypes_i_o(i,o,name) for i,o in enumerate(operators)])
     types_list = ( [parent_type]
            + [name+"_type" + str(i) for i,o in enumerate(operators)] 
-           + [name+"_"+str(i)+"_sub_array" for i,o in enumerate(operators) if hasattr(o,"ops")])
+           + [name+"_"+str(i)+"_sub_array_type" for i,o in enumerate(operators) if hasattr(o,"ops")])
     ret = ret + "\ntypedef "+name+"<" + ",".join(types_list) +"> "+name+"_sub;"
     return [ret,name+"_sub("+",".join([name+"_sequence"+str(i)+"_array" for i,o in enumerate(operators) if hasattr(o,"ops")])+")"]
 
