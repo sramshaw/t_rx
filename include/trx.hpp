@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-
+#include "smart_assert.hpp"
 
 class rx_usable {
 public: //observable
