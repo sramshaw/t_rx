@@ -9,9 +9,9 @@ extern "C" {
 #include "../../include/trx.hpp"
 
 
-#define DEBUG               false
-#define COMPLETED           false
-#define PROOF_BY_MESSAGE    false
+#define DEBUG               true
+#define COMPLETED           true
+#define PROOF_BY_MESSAGE    true
 
 static void nothing(){}
 void tests();
@@ -26,17 +26,17 @@ static void n_trace(long n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n 
 static void c_trace(void* obj)      {if (COMPLETED) std::cout << "[TRACE] seq > completed\n" << std::flush;  }
 
 ///////////////////////// TESTS
-void test_generated();
+void test_generated_main_loop();
 void tests(){
     if (DEBUG) std::cout << "\n\n//// START OF TESTS /////\n";
     {
-    	test_generated();
+    	test_generated_main_loop();
         if (DEBUG) std::cout << "************* end test ************\n" << std::flush;
     }
 }
 
 
-void test_generated(){
+void test_generated_main_loop(){
   struct { long v; long total; } c;
   c.v= 0;
   c.total = 0;
@@ -45,7 +45,8 @@ void test_generated(){
   {
       auto c0= c;
 
-      sequence seq16 = [c0] => fromPublisher<unsigned> (tick1)
+#define SEQUENCE
+    sequence seq16 = [c0] => fromPublisher<unsigned> (tick1)
           scan c0, (acc,n) => { acc.total++;  return acc;  }
           select x => x.total
           select x => { return x *2 ;}
@@ -60,6 +61,7 @@ void test_generated(){
           select x => (x + 2)
           endObservable
           ;
+#undef SEQUENCE;
 
       seq16.subscribe(&n_trace, &c_trace, nullptr);
       if (DEBUG) std::cout << "\nready to go, enable: \n" << std::flush;

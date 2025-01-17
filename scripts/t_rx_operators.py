@@ -114,7 +114,7 @@ class fromJust:
         index   = index + 1
         self.external = ''
         self.common= (
-  '  inline void from_connect   (void (*n)(type0,void*), void(*c)(void*), void* self){_exchange.type_%(i)d = (type0)('+arg2+');transform_next%(inci)d();transform_complete%(inci)d();}\n'
+  '  inline void from_connect   (void (*n)(type0,void*), void(*c)(void*), void* self){_exchange.type_%(i)d = (type0)('+arg2+');transform_next%(inci)d();if(this->enabled)transform_complete%(inci)d();}\n'
   '  inline void from_disconnect(void (*n)(type0,void*), void(*c)(void*), void* self){}\n'
   '  static void transform_next0(type%(i)d v%(i)d, void *obj) {}\n'
   '  static void transform_complete0(void *obj)       {}\n') %locals()
@@ -261,7 +261,7 @@ class take:
         self.trampoline =(
   "  decltype(" + count + ") counter%(i)d = 0;\n"
   'inline void transform_next%(i)d()     { counter%(i)d++; transform_next%(inci)d(); if (counter%(i)d >= ' + count + ') {transform_complete%(i)d(); std::cout<<"was here"; }}\n'
-  '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }'
+  '  inline void transform_complete%(i)d() { if(this->enabled)transform_complete%(inci)d(); }'
             ) %locals()
         self.outputType =('typedef ' + name + '_type%(deci)d ' + name + '_type%(i)d;') %locals()
         self.index=i
@@ -275,7 +275,7 @@ class selectmany:
         index = index +1
         subName         = "%(name)s_%(i)d" %locals() 
         index = 0
-        self.ops = [getEntity(o,subName, name+"_type%(deci)d"%locals(),var) for o in op[5]]
+        self.ops = [getEntity(o,subName, name+"_type" + str(deci),var) for o in op[5]]
         self.class_definition = create_class(name,var,self.ops)
         self.capture = var
         index = i + 1
@@ -287,17 +287,14 @@ class selectmany:
   "  decltype(" + maxConcurrent + ") counter%(i)d;\n"
   "  bool bool%(i)d;\n"
   "  inline void transform_next%(i)d()     {bool%(i)d=false; bool success = assign_work%(i)d(_exchange.type_%(deci)d);if (success) counter%(i)d++; /*std::cout<<\""+name+"\"<<\" count up \"<<counter%(i)d<<\"\\n\"<<std::flush;*/}\n"
-  "  inline void transform_complete%(i)d_() { counter%(i)d--;  /*std::cout<<\""+name+"\"<<\" count down \"<<counter%(i)d<<\"\\n\"<<std::flush; */ if(!counter%(i)d<=0 || !bool%(i)d) return; /*unbind%(i)d();*/   transform_complete%(inci)d();}\n"
-  "  inline void transform_complete%(i)d() { bool%(i)d = true;if(!counter%(i)d<=0) return; /*unbind%(i)d();*/   transform_complete%(inci)d();}\n"
+  "  inline void transform_complete%(i)d() { bool%(i)d = true;if(!counter%(i)d<=0)               return; transform_complete%(inci)d();}\n"
   "  static void receive_next%(i)d(type%(i)d v%(i)d, void *obj) {"
   "    //std::cout << \"receive next%(i)d \" << v%(i)d << \"\\n\" << std::flush;\n"
   "    auto self = static_cast<%(name)s *>(obj);"
   "    self->_exchange.type_%(i)d = v%(i)d;"
   "    self->transform_next%(inci)d();"
   "  }\n"
-  "  static void receive_complete%(i)d(void *obj) {"
-       "    auto self = static_cast<%(name)s *>(obj);"
-   "self->transform_complete%(i)d_();}\n"
+  "  static void receive_complete%(i)d(void *obj) {}\n"
   "  inline void init_higher_order%(i)d()   { counter%(i)d=0; bind%(i)d(&receive_next%(i)d, &receive_complete%(i)d);}") %locals()
 
         self.straight   = ''

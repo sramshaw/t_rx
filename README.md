@@ -134,7 +134,6 @@ Ubuntu clang-format version 18.1.3 (1ubuntu1)
       seq14.disable();
   }
 ```
-TBD: explain distinction transform_complete2 transform_complete2_
 
 ```plantuml
 @startuml lifecycle of captured variables
@@ -371,5 +370,3 @@ deactivate stack
 @enduml
 
 ```
-
-markdown-preview-enhanced.plantumlJarPath .vscode-server/extensions/jebbs.plantuml-2.18.1/plantuml.jar
