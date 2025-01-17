@@ -275,7 +275,7 @@ class selectmany:
         index = index +1
         subName         = "%(name)s_%(i)d" %locals() 
         index = 0
-        self.ops = [getEntity(o,subName, name+"_type%(deci)d"%locals(),var) for o in op[5]]
+        self.ops = [getEntity(o,subName, name+"_type" + str(deci),var) for o in op[5]]
         self.class_definition = create_class(name,var,self.ops)
         self.capture = var
         index = i + 1
