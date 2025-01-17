@@ -37,9 +37,11 @@ void tests(){
 
 
 void test_generated_main_loop(){
-  struct { long v; long total; } c;
+  struct { long v; long total; std::array<long,1> totals ={0}; std::array<long,1> totals2 ={0};} c;
   c.v= 0;
   c.total = 0;
+  c.totals[0] = 0;
+  c.totals2[0] = 0;
 
   auto start_time = std::chrono::high_resolution_clock::now();
   {
@@ -47,9 +49,13 @@ void test_generated_main_loop(){
 
 #define SEQUENCE
     sequence seq16 = [c0] => fromPublisher<unsigned> (tick1)
-          do     x => std::cout << "_n = " << x << std::flush
+          do     x => std::cout << "_n = " << x                 << std::flush
           scan c0->total, (acc,n) => { acc += n;  return acc;  }, acc => acc
-          do     acc => std::cout << ", _acc = " << acc << "\n" << std::flush
+          do     acc => std::cout << ", _acc = " << acc         << std::flush
+          scan c0->totals[0], (acc,n) => { acc += n;  return acc;  }, acc => acc
+          do     acc => std::cout << ", _acc = " << acc         << std::flush
+          scan c0->totals2[..], (acc,n) => { acc += n;  return acc;  }, acc => acc
+          do     acc => std::cout << ", accs = " << acc << "\n" << std::flush
           select x => x
           select x => { return x *2 ;}
           select x => { return { c =  x +2}; }

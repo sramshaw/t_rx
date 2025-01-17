@@ -25,7 +25,7 @@ def create_class(name,capture,f_ops):
               + '\n          if (!element.enabled) {'
               + '\n              element.exit_obj=this;'
               + '\n              //std::cout << \"assign work @\"<<i<<\" \\n\" << std::flush;'
-              + '\n              return element.enable(x);'
+              + '\n              return element.enable(x,i);'
               + '\n          }'
               + '\n          i++;'
               + '\n      }'
@@ -48,10 +48,12 @@ def create_class(name,capture,f_ops):
               + '\n          element.subscribe(n,c,this);'
               + '\n  };') %locals() for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
               + '\n  _c0 ' + capture +';'
+              + '\n  int indexed;'
               + '\n  typedef type' + str(s-1) + " output;"
-              + "\n  bool enable(_c0 a0) {this->enabled = true; "+capture+"=a0;" 
+              + "\n  bool enable(_c0 a0, int i) {this->enabled = true; "+capture+"=a0; indexed =i;" 
               + "\n  ".join([ o.internal_enable for i,o in enumerate(f_ops) if hasattr(o,'internal_enable')])
-              + "\n   from_connect   (&transform_next0, &transform_complete0, this); return true;}"
+              + "\n    from_connect   (&transform_next0, &transform_complete0, this); return true;}"
+              + "\n  bool enable(_c0 a0) {return enable(a0,0);}" 
               + "\n  void disable()      {"
               + "\n    //std::cout<<\"disable " + name + "\\n\"<<std::flush;"
               + "\n    from_disconnect(&transform_next0, &transform_complete0, this);"
@@ -157,37 +159,9 @@ def expand_anon_types(s):
         return ret
     return s
 
-class scan:
-    def __init__(self, op, name, captype,capture, init,acc,n, funcBody):
-        index = op[3]
-        transformed      = expand_anon_types(funcBody)
-        transformed_init = expand_anon_types(init)
-        print(op[4][2])
-        #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
-        i       = index
-        deci    = i+1
-        index   = index + 1
-        funcName        = "%(name)s_fs%(i)d" %locals() 
-        deci            = i-1
-        inci            = i+1
-        self.external   = ('template<typename _c0> auto %(funcName)s_init (_c0 %(capture)s)%(transformed_init)s\n' 
-                           'template<typename _c0, typename type%(deci)d, typename type%(i)d> auto %(funcName)s (_c0 %(capture)s, type%(deci)d %(n)s,type%(i)d %(acc)s)%(transformed)s\n' 
-                          )% locals()
-        self.straight   =''
-        self.trampoline =(
-    'inline void transform_next%(i)d()     { %(acc)s = %(funcName)s(%(capture)s,_exchange.type_%(deci)d,%(acc)s); _exchange.type_%(i)d = %(acc)s; transform_next%(inci)d(); }\n'
-  '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }\n'
-  '  type%(i)d %(acc)s;\n'
-  "  inline void init_scan%(i)d()   { %(acc)s = %(funcName)s_init (%(capture)s);}\n"
-            ) %locals()
-        self.outputType =('typedef decltype(%(funcName)s_init<%(captype)s>(%(captype)s{})) ' + name + '_type%(i)d;') %locals()
-        self.internal_enable = 'init_scan' + str(i) + "();"
-        self.index=i
-
 class select:
     def __init__(self, op, name, captype,capture, var, funcBody):
         index = op[3]
-        transformed = expand_anon_types(funcBody)
         print(op[4][2])
         #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
         i       = index
@@ -196,6 +170,7 @@ class select:
         funcName        = "%(name)s_fs%(i)d" %locals() 
         deci            = i-1
         inci            = i+1
+        transformed = expand_anon_types(funcBody) % locals() # used for scan operator
         self.external   = 'template<typename _c0, typename type%(deci)d> auto %(funcName)s (_c0 %(capture)s, type%(deci)d %(var)s)%(transformed)s' % locals()
         self.straight   =''
         self.trampoline =(
