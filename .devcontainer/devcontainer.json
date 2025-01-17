@@ -15,7 +15,14 @@
 		"vscode": {
 			"settings": {},
 			"extensions": [
-				"streetsidesoftware.code-spell-checker"
+				"streetsidesoftware.code-spell-checker",
+				"jebbs.plantuml",
+				"myml.vscode-markdown-plantuml-preview",
+				"bat67.markdown-extension-pack",
+				"csholmq.excel-to-markdown-table",
+				"ms-azuretools.vscode-docker",
+				"yzhang.markdown-all-in-one",
+				"ms-python.python"
 			]
 		}
 	}
