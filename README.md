@@ -19,6 +19,7 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [Notes](#notes)
     - [uml diagram using plantuml plugin](#uml-diagram-using-plantuml-plugin)
     - [tooling versions](#tooling-versions)
+  - [contribute](#contribute)
   - [release notes](#release-notes)
   - [design](#design)
 
@@ -89,6 +90,13 @@ DISTRIB_DESCRIPTION="Ubuntu 24.04.1 LTS"
 $ clang-format --version
 Ubuntu clang-format version 18.1.3 (1ubuntu1)
 ```
+
+### contribute
+
+So far this is a solo POC, but I am open to suggestions. I believe the parsing approach with regex is flawed and constraining, but workable. For now learning is the main objective, with great results and coverage.
+
+Here is an intersting website for working on the parser with regex, and expecially captures: https://regex101.com/r/D5mUTo/1
+
 
 ### release notes
 - v0.1 - the original design has the following decomposition of features:
