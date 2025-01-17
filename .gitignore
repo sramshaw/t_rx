@@ -4,4 +4,4 @@
 *.swp
 *.swo
 *.log
-*.exe
+*.exe*

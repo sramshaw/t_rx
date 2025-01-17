@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch pythagorian",
+            "name": "Debug pythagorian",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/examples/pythagorian/pythagorian-debug",
@@ -22,7 +22,7 @@
             "preLaunchTask": "Build All"
         },
         {
-            "name": "Launch showcase",
+            "name": "Debug showcase",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/examples/showcase/showcase-debug",
