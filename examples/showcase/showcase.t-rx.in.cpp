@@ -43,12 +43,14 @@ void test_generated_main_loop(){
 
   auto start_time = std::chrono::high_resolution_clock::now();
   {
-      auto c0= c;
+      auto c0= &c;
 
 #define SEQUENCE
     sequence seq16 = [c0] => fromPublisher<unsigned> (tick1)
-          scan c0, (acc,n) => { acc.total++;  return acc;  }
-          select x => x.total
+          do     x => std::cout << "_n = " << x << std::flush
+          scan c0->total, (acc,n) => { acc += n;  return acc;  }, acc => acc
+          do     acc => std::cout << ", _acc = " << acc << "\n" << std::flush
+          select x => x
           select x => { return x *2 ;}
           select x => { return { c =  x +2}; }
           select x => x.c
