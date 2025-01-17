@@ -15,7 +15,39 @@ def create_class(name,capture,f_ops):
                 ["typename type" + str(i) for i in range(0,s)]
               + ["typename " + (o.internal_dcl + str(i)) for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')]
               ) + ">\n")
-    ret =(ret + 'class ' + name + ':public observable<type' + str(s-1) + '>{\npublic:\n  _c0 ' + capture +';'
+    ret =(ret + 'class ' + name + ':public observable<type' + str(s-1) + '>{\npublic:\n ' 
+
+              + "\n  ".join([(o.internal_dcl + str(i) + "& repo" + str(i) + ";") for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
+              + "\n  ".join([ 
+              ( '\n  inline bool assign_work%(i)d(type' +str(i-1)+' x) {'
+              + '\n      auto i =0;'
+              + '\n      for(auto& element: repo%(i)d) {'
+              + '\n          if (!element.enabled) {'
+              + '\n              element.exit_obj=this;'
+              + '\n              //std::cout << \"assign work @\"<<i<<\" \\n\" << std::flush;'
+              + '\n              return element.enable(x);'
+              + '\n          }'
+              + '\n          i++;'
+              + '\n      }'
+              + '\n      return false;'
+              + '\n  };'
+              + '\n  inline void disableFrom%(i)d() {'
+              + '\n      for(auto& element: repo%(i)d) {'
+              + '\n          if (element.exit_obj==this) {'
+              + '\n              return element.disable();'
+              + '\n          }'
+              + '\n      }'
+              + '\n  };'
+              + '\n  void unbind%(i)d () {'
+              + '\n      for(auto& element: repo%(i)d)'
+              + '\n          if (element.enabled)   element.disable();'
+              + '\n  };'
+              + '\n  inline void bind%(i)d(void (*n)(type%(i)d,void*), void(*c)(void*)) {'
+              + '\n      //if (DEBUG) std::cout << \"binding seqs!! \\n\" << std::flush;'
+              + '\n      for(auto& element: repo%(i)d)'
+              + '\n          element.subscribe(n,c,this);'
+              + '\n  };') %locals() for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
+              + '\n  _c0 ' + capture +';'
               + '\n  typedef type' + str(s-1) + " output;"
               + "\n  bool enable(_c0 a0) {this->enabled = true; "+capture+"=a0;" 
               + "\n  ".join([ o.internal_enable for i,o in enumerate(f_ops) if hasattr(o,'internal_enable')])
@@ -26,11 +58,10 @@ def create_class(name,capture,f_ops):
               + "\n    this->enabled = false;"
               + "\n    ".join([o.ondisable for o in f_ops if hasattr(o,'ondisable')])
               + "\n  }"
-              + "\n  "+ "\n  ".join([(o.internal_dcl + str(i) + "& " + o.internal_dcl[0] + str(i) + ";") for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
               + "\n  " + name + "("
               + ",".join([  o.internal_dcl + str(i) + "& a" + str(i) for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
               + ") "+ (":" if any([hasattr(o,'internal_dcl') for o in f_ops]) else "")
-              + ",".join([  o.internal_dcl[0:1] + str(i) + "(a" + str(i) + ")" for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
+              + ",".join([ "repo" + str(i) + "(a" + str(i) + ")" for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
               + "{"
               + "\n  ".join([ o.internal_setup for i,o in enumerate(f_ops) if hasattr(o,'internal_setup')])
               + "  }\n"
@@ -251,13 +282,13 @@ class selectmany:
         inci            = i + 1
         deci            = i - 1
         self.external   = ''
-        self.ondisable = "\n    m%(i)d.disableFrom(this);" %locals()
+        self.ondisable = "\n    disableFrom%(i)d();" %locals()
         self.trampoline =   (
   "  decltype(" + maxConcurrent + ") counter%(i)d;\n"
   "  bool bool%(i)d;\n"
-  "  inline void transform_next%(i)d()     {bool%(i)d=false; bool success = m%(i)d.assign_work(_exchange.type_%(deci)d, this);if (success) counter%(i)d++; /*std::cout<<\""+name+"\"<<\" count up \"<<counter%(i)d<<\"\\n\"<<std::flush;*/}\n"
-  "  inline void transform_complete%(i)d_() { counter%(i)d--;  /*std::cout<<\""+name+"\"<<\" count down \"<<counter%(i)d<<\"\\n\"<<std::flush; */ if(!counter%(i)d<=0 || !bool%(i)d) return; /*m%(i)d.unbind();*/   transform_complete%(inci)d();}\n"
-  "  inline void transform_complete%(i)d() { bool%(i)d = true;if(!counter%(i)d<=0) return; /*m%(i)d.unbind();*/   transform_complete%(inci)d();}\n"
+  "  inline void transform_next%(i)d()     {bool%(i)d=false; bool success = assign_work%(i)d(_exchange.type_%(deci)d);if (success) counter%(i)d++; /*std::cout<<\""+name+"\"<<\" count up \"<<counter%(i)d<<\"\\n\"<<std::flush;*/}\n"
+  "  inline void transform_complete%(i)d_() { counter%(i)d--;  /*std::cout<<\""+name+"\"<<\" count down \"<<counter%(i)d<<\"\\n\"<<std::flush; */ if(!counter%(i)d<=0 || !bool%(i)d) return; /*unbind%(i)d();*/   transform_complete%(inci)d();}\n"
+  "  inline void transform_complete%(i)d() { bool%(i)d = true;if(!counter%(i)d<=0) return; /*unbind%(i)d();*/   transform_complete%(inci)d();}\n"
   "  static void receive_next%(i)d(type%(i)d v%(i)d, void *obj) {"
   "    //std::cout << \"receive next%(i)d \" << v%(i)d << \"\\n\" << std::flush;\n"
   "    auto self = static_cast<%(name)s *>(obj);"
@@ -267,11 +298,11 @@ class selectmany:
   "  static void receive_complete%(i)d(void *obj) {"
        "    auto self = static_cast<%(name)s *>(obj);"
    "self->transform_complete%(i)d_();}\n"
-  "  inline void init_higher_order%(i)d()   { counter%(i)d=0; m%(i)d.bind(&receive_next%(i)d, &receive_complete%(i)d, this);}") %locals()
+  "  inline void init_higher_order%(i)d()   { counter%(i)d=0; bind%(i)d(&receive_next%(i)d, &receive_complete%(i)d);}") %locals()
 
         self.straight   = ''
         self.outputType =('typedef ' + subName + '_sub::output ' + name+ '_type%(i)d;') %locals()
-        self.internal_dcl = 'manager'
+        self.internal_dcl = 'repo_t'
         self.internal_setup = 'init_higher_order' + str(i) + "();"
         self.index=i
         self.maxConcurrent = maxConcurrent

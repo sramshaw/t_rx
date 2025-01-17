@@ -18,7 +18,8 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [Status : in construction](#status--in-construction)
   - [Notes](#notes)
     - [uml diagram using plantuml plugin](#uml-diagram-using-plantuml-plugin)
-    - [versions](#versions)
+    - [tooling versions](#tooling-versions)
+  - [release notes](#release-notes)
   - [design](#design)
 
 
@@ -65,7 +66,7 @@ it did not work for me until I installed on WSL: ```sudo apt install openjdk-21-
 extensions used: [listed here](./.vscode/extensions.json)
 
 
-#### versions
+#### tooling versions
 by running ```./versions.sh``` in the container as per ```./build_and_explore.sh```, here is the snapshot of the versions seen during a successful execution: 
 
 ```shell
@@ -89,6 +90,23 @@ $ clang-format --version
 Ubuntu clang-format version 18.1.3 (1ubuntu1)
 ```
 
+### release notes
+- v0.1 - the original design has the following decomposition of features:
+  - sequence class that
+    - concatenates most of the operators using a union variable to hold the transformed values over time
+    - branches out values to sub sequences as needed for selectmany (aka flatmap)
+  - foreach selectmany operator, a manager class that handles a pool (std::array) of sub-sequences
+    - binds the sub- sequences to the main sequence, and also
+    - initiates immediate inits with assign_work
+    - ultimately disposes (aka disables in the case of the pool approach) the sub
+- v0.2 - optimization , this version now merges the managers within the sequence owning the corresponding selectmany logic
+  - this reduces the number of indirections
+    - seen by smaller binary:
+    >-rwxr-xr-x 1 root   root   18840 Jan 16 23:28 pythagorian.exe.original
+    -rwxr-xr-x 1 root   root   18592 Jan 16 23:27 pythagorian.exe.merge_binding_to_sequence  
+    - we can see that ~250 bytes are spared by this, explained by more inlining
+  - note that it is possible to abstract more parts of the system to have a manager that is more generic, and therefore reusable when the templates are redundant
+    - this is no likely though, and still requires more execution
 
 ### design
 
@@ -133,7 +151,7 @@ participant seq14_2_sequence2_array.n [
   + bool enabled
   + constr() => enabled =false;
   ----
-  __is observable(seq_14_manager2)__
+  __is observable(seq14_sub)__
   - exit_next
   - exit complete
   + void* exit_obj
@@ -157,8 +175,8 @@ participant seq14_2_sequence2_array [
   is std::array<subsequence>
 ]
 
-participant seq_14_2_manager2 [
-  = seq_14_2_manager2
+participant seq14_sequence2_array.n [
+  = seq14_sequence2_array.n
   ----
   is high_order_manager(sequence_array)
   ----
@@ -176,7 +194,7 @@ participant seq14_sequence2_array.n [
   + bool enabled
   + constr() => enabled =false;
   ----
-  __is observable(seq_14_manager2)__
+  __is observable(seq14_sub)__
   - exit_next
   - exit complete
   + void* exit_obj
@@ -199,24 +217,18 @@ participant seq14_sequence2_array [
   ----
   is std::array<subsequence>
 ]
-participant seq_14_manager2 [
-  = seq_14_manager2
+participant seq14_sub [
+  = seq14_sub
   ----
-  is high_order_manager(sequence_array)
-  ----
-  + constructor
   + bind 
   + unbind
   + assign_work
-]
-participant seq14_sub [
-  = seq14_sub
   ----
   __is rx_usable()__
   + bool enabled
   + constr() => enabled =false;
   ----
-  __is observable(seq_14_manager2)__
+  __is observable(seq14_sub)__
   - exit_next
   - exit complete
   + void* exit_obj
@@ -247,7 +259,7 @@ participant seq14_sub [
 ' from interior to exterior
 stack->stack: stack reservations \nat declaration
 
-stack -> seq14_2_sequence2_array.n : create (seq_14_2_manager2)
+stack -> seq14_2_sequence2_array.n : create (seq14_sequence2_array.n)
 activate stack #AAAAAA
 activate seq14_2_sequence2_array.n #FFBBBB
 seq14_2_sequence2_array.n -> seq14_2_sequence2_array.n : __func_init_higher_order__:\n    count =0 
@@ -257,36 +269,31 @@ deactivate seq14_2_sequence2_array.n
 seq14_2_sequence2_array.n -> stack
 deactivate seq14_2_sequence2_array.n
 
-stack -> seq14_2_sequence2_array : create (seq14_2_sequence2_array.n)\noutside manager\nso that is on the stack at top level\nof declaring function
+stack -> seq14_2_sequence2_array : create (seq14_2_sequence2_array.n)\noutside sequence\nso that is on the stack at top level\nof declaring function
 activate stack #AAAAAA
 
-stack -> seq_14_2_manager2 : create (seq14_sequence2_array.n)
-activate stack #AAAAAA
-
-stack -> seq14_sequence2_array.n : create (seq_14_2_manager2)
+stack -> seq14_sequence2_array.n : create (seq14_sequence2_array.n)
 activate stack #AAAAAA
 activate seq14_sequence2_array.n #FFBBBB
 seq14_sequence2_array.n -> seq14_sequence2_array.n : __func_init_higher_order__:\n    count =0 
 activate seq14_sequence2_array.n #FF4444
-seq14_sequence2_array.n -> seq_14_2_manager2 : bind (this.receive_next, this.receive_complete, this)
-seq_14_2_manager2 -> seq14_sequence2_array.n
+seq14_sequence2_array.n -> seq14_sequence2_array.n : bind (this.receive_next, this.receive_complete, this)
+seq14_sequence2_array.n -> seq14_sequence2_array.n
 deactivate seq14_sequence2_array.n
 seq14_sequence2_array.n -> stack
 deactivate seq14_sequence2_array.n
 
-stack -> seq14_sequence2_array : create (seq14_sequence2_array.n)\noutside manager\nso that is on the stack at top level\nof declaring function
+stack -> seq14_sequence2_array : create (seq14_sequence2_array.n)\noutside sequence\nso that is on the stack at top level\nof declaring function
 activate stack #AAAAAA
 
 
-stack -> seq_14_manager2 : create (seq14_sequence2_array.n)
-activate stack #AAAAAA
-stack -> seq14_sub : create (seq_14_manager2)
+stack -> seq14_sub : create (seq14_sequence2_array.n)
 activate stack #AAAAAA
 activate seq14_sub #FFBBBB
 seq14_sub -> seq14_sub : __func_init_higher_order__:\n    count =0 
 activate seq14_sub #FF4444
-seq14_sub -> seq_14_manager2 : bind (this.receive_next, this.receive_complete, this)
-seq_14_manager2 -> seq14_sub
+seq14_sub -> seq14_sub : bind (this.receive_next, this.receive_complete, this)
+seq14_sub -> seq14_sub
 deactivate seq14_sub
 seq14_sub -> stack
 deactivate seq14_sub
@@ -306,13 +313,13 @@ seq14_sub -> seq14_sub : for loop logic starts\npushing integers to transform_ne
 seq14_sub -> seq14_sub : select logic\n transform_next1 applies seq14_fs1\n z1 => struct {z = z1, c = c0}
 activate seq14_sub
 seq14_sub -> seq14_sub : selectmany logic\n try to assign work to subsequence
-seq14_sub -> seq_14_manager2 : success =assignwork(for_capture, this)
+seq14_sub -> seq14_sub : success =assignwork(for_capture, this)
 
-seq_14_manager2 -> seq14_sequence2_array : get iterator => foreach element
-seq_14_manager2 -> seq_14_manager2 : if element.enabled==false, then
-seq_14_manager2 -> seq14_sequence2_array.n : element.exit_obj=caller
+seq14_sub -> seq14_sequence2_array : get iterator => foreach element
+seq14_sub -> seq14_sub : if element.enabled==false, then
+seq14_sub -> seq14_sequence2_array.n : element.exit_obj=caller
 'note: should above be passed in enabler?
-seq_14_manager2 -> seq14_sequence2_array.n : ret = enable(captured)
+seq14_sub -> seq14_sequence2_array.n : ret = enable(captured)
 seq14_sequence2_array.n -> seq14_sequence2_array.n : same logic
 'same logic within for seq14_sequence2_array.n.enable,
 ' and again within 
@@ -325,17 +332,17 @@ seq14_sub -> seq14_sub : disable();
 activate seq14_sub
 seq14_sub -> seq14_sub : enable = false;
 seq14_sub -> seq14_sub : enable = false;
-seq14_sub -> seq_14_manager2 : disableFrom(this)
-seq_14_manager2 -> seq14_sequence2_array : get iterator\nforeach element
-seq_14_manager2 -> seq14_sequence2_array.n : if (element.exitObject == caller)
-seq_14_manager2 -> seq14_sequence2_array.n : element.disable()
-seq_14_manager2 -> seq14_sub
+seq14_sub -> seq14_sub : disableFrom(this)
+seq14_sub -> seq14_sequence2_array : get iterator\nforeach element
+seq14_sub -> seq14_sequence2_array.n : if (element.exitObject == caller)
+seq14_sub -> seq14_sequence2_array.n : element.disable()
+seq14_sub -> seq14_sub
 deactivate seq14_sub
 deactivate seq14_sub
 
 seq14_sub -> seq14_sub
 seq14_sub -> seq14_sequence2_array.n
-seq14_sequence2_array.n -> seq_14_manager2: return true
+seq14_sequence2_array.n -> seq14_sub: return true
 ' need o revisit the dispose() story. is the completed from top observable propagating down: .
 ' transform_next2 probably needs to call transform_complete2() if !this->enabled,
 '  transform_complete2 should call manager.unbind ()
@@ -343,7 +350,7 @@ seq14_sequence2_array.n -> seq_14_manager2: return true
 ' transform_complete4() to call transform_complete5()
 
 
-seq_14_manager2 -> seq14_sub : return ret or 'no element => false'
+seq14_sub -> seq14_sub : return ret or 'no element => false'
 
 ' seems below is for tracing?
 seq14_sub -> seq14_sub : if success counter2++
