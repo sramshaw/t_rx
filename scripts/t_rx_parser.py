@@ -51,7 +51,7 @@ def getRxGrammar():
     [   "scan1",
         'scan\s+(\w+)->(\w+)\s*\[\s*\.\.\s*\]\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*(\{.*\})\s*,\s*(\w+)\s*=>\s*(.*)',
         "",
-        "select(op,name,captype,capture,a(4),'{ typedef decltype('+a(1)+'->'+a(2)+'[0]) _'+a(3)+'; auto accumulate = [](_'+a(3)+' '+a(3)+',type%(deci)d '+a(4)+')'+a(5)+'; auto project = [](_'+a(3)+' '+a(6)+'){ return '+a(7)+';}; '+a(1)+'->'+a(2)+'[1] = accumulate('+a(1)+'->'+a(2)+'[1],'+a(4)+'); return project('+a(1)+'->'+a(2)+'[1]); }')"], 
+        "scan(op,name,captype,capture,a(4),'{ typedef decltype('+a(1)+'->'+a(2)+'[0]) _'+a(3)+'; auto accumulate = [](_'+a(3)+' '+a(3)+',type%(deci)d '+a(4)+')'+a(5)+'; auto project = [](_'+a(3)+' '+a(6)+'){ return '+a(7)+';}; '+a(1)+'->'+a(2)+'[index] = accumulate('+a(1)+'->'+a(2)+'[index],'+a(4)+'); return project('+a(1)+'->'+a(2)+'[index]); }')"], 
     [   "scan2",
         'scan\s+(\w+)->(\w+)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*(\{.*\})\s*,\s*(\w+)\s*=>\s*(.*)',
         "",

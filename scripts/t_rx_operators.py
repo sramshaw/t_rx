@@ -180,6 +180,27 @@ class select:
         self.outputType =('typedef decltype(%(funcName)s<%(captype)s,' + name + '_type%(deci)d>(%(captype)s{},'+name+'_type%(deci)d{})) ' + name + '_type%(i)d;') %locals()
         self.index=i
 
+class scan:
+    def __init__(self, op, name, captype,capture, var, funcBody):
+        index = op[3]
+        print(op[4][2])
+        #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
+        i       = index
+        deci    = i+1
+        index   = index + 1
+        funcName        = "%(name)s_fs%(i)d" %locals() 
+        deci            = i-1
+        inci            = i+1
+        transformed = expand_anon_types(funcBody) % locals() # used for scan operator
+        self.external   = 'template<typename _c0, typename type%(deci)d> auto %(funcName)s (_c0 %(capture)s, int index, type%(deci)d %(var)s)%(transformed)s' % locals()
+        self.straight   =''
+        self.trampoline =(
+    'inline void transform_next%(i)d()     { _exchange.type_%(i)d = %(funcName)s(%(capture)s,indexed,_exchange.type_%(deci)d); transform_next%(inci)d(); }\n'
+  '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }'
+            ) %locals()
+        self.outputType =('typedef decltype(%(funcName)s<%(captype)s,' + name + '_type%(deci)d>(%(captype)s{},0,'+name+'_type%(deci)d{})) ' + name + '_type%(i)d;') %locals()
+        self.index=i
+
 class where:
     def __init__(self, op, name, captype,capture, var, funcBody):
         index = op[3]
@@ -270,11 +291,12 @@ class selectmany:
   "    self->transform_next%(inci)d();"
   "  }\n"
   "  static void receive_complete%(i)d(void *obj) {}\n"
-  "  inline void init_higher_order%(i)d()   { counter%(i)d=0; bind%(i)d(&receive_next%(i)d, &receive_complete%(i)d);}") %locals()
+  "  inline void init_higher_order%(i)d()   { counter%(i)d=0; bind%(i)d(&receive_next%(i)d, &receive_complete%(i)d);}"
+  ) %locals()
 
         self.straight   = ''
         self.outputType =('typedef ' + subName + '_sub::output ' + name+ '_type%(i)d;') %locals()
-        self.internal_dcl = 'repo_t'
+        self.internal_dcl = 'subsequence_array_t'
         self.internal_setup = 'init_higher_order' + str(i) + "();"
         self.index=i
         self.maxConcurrent = maxConcurrent
