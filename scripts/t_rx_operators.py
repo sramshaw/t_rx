@@ -301,7 +301,7 @@ class scan:
         deci            = i-1
         inci            = i+1
         transformed = expand_anon_types(funcBody) % locals() # used for scan operator
-        self.external   = 'template<typename _c0, typename %(special_capture)s_t, typename type%(deci)d> auto %(funcName)s (_c0 %(capture)s, %(special_capture)s_t %(special_capture)s,  int index, type%(deci)d %(var)s)%(transformed)s' % locals()
+        self.external   = 'template<typename _c0, typename %(special_capture)s_t, typename type%(deci)d> auto %(funcName)s (_c0 %(capture)s, %(special_capture)s_t& %(special_capture)s,  int index, type%(deci)d %(var)s)%(transformed)s' % locals()
         self.straight   =''
         self.trampoline =(
     'inline void transform_next%(i)d()     { _exchange.type_%(i)d = %(funcName)s(%(capture)s,repo%(i)d,indexed,_exchange.type_%(deci)d); transform_next%(inci)d(); }\n'
