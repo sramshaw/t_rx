@@ -115,6 +115,12 @@ Here is an intersting website for working on the parser with regex, and expecial
     - we can see that ~250 bytes are spared by this, explained by more inlining
   - note that it is possible to abstract more parts of the system to have a manager that is more generic, and therefore reusable when the templates are redundant
     - this is no likely though, and still requires more execution
+-  v0.3
+   -  scan opertor using simple ints on capture no issue, but limited use when nested in selectmany
+   -  scan using accumulator pool, issue passing the pool via capture
+      -  the anonymous struct approach leads to union issue due to non-trivial constructors
+      -  call for passing the pools explicitely, which should not be too hard, like selectmany
+      -  partial implementation (not compiling yet) with capture of array of accumulators, missing the init of the array of sequences
 
 ### design
 
