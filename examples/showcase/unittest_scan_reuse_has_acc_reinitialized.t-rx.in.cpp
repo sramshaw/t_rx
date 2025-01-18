@@ -1,29 +1,18 @@
 extern "C" {
     #include<stdio.h>
 }
-
-#include <fstream>
 #include <iostream>
-#include <chrono>
-#include "tick1.hpp"
 #include "../../include/trx.hpp"
 
-
-#define DEBUG               true
-#define COMPLETED           true
-#define PROOF_BY_MESSAGE    true
-
-static void nothing(){}
 void tests();
-
 int main(){
     tests();
 }
 
 ///////////////////////// GENERATED CODE UTILITIES
 // utils for visualizing the code generated
-static void n_trace(long n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n << "\n" << std::flush;}
-static void c_trace(void* obj)      {if (COMPLETED) std::cout << "[TRACE] seq > completed\n" << std::flush;  }
+static void n_trace(long n, void* obj) {std::cout << "[TRACE] " << n << "\n" << std::flush;}
+static void c_trace(void* obj)         {std::cout << "[TRACE] seq > completed\n" << std::flush;  }
 
 ///////////////////////// TESTS
 void test_generated_main_loop();
