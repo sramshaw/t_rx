@@ -4,28 +4,9 @@ extern "C" {
 #include <iostream>
 #include "../../include/trx.hpp"
 
-void tests();
-int main(){
-    tests();
-}
-
-///////////////////////// GENERATED CODE UTILITIES
-// utils for visualizing the code generated
 static void n_trace(long n, void* obj) {std::cout << "[TRACE] " << n << "\n" << std::flush;}
 static void c_trace(void* obj)         {std::cout << "[TRACE] seq > completed\n" << std::flush;  }
-
-///////////////////////// TESTS
-void test_generated_main_loop();
-void tests(){
-    if (DEBUG) std::cout << "\n\n//// START OF TESTS /////\n";
-    {
-    	test_generated_main_loop();
-        if (DEBUG) std::cout << "************* end test ************\n" << std::flush;
-    }
-}
-
-
-void test_generated_main_loop(){
+int main(){
     struct { long v;} c;
     std::array<long,1> totals2 ={0};
     auto c0= &c;
@@ -46,7 +27,6 @@ void test_generated_main_loop(){
 #undef SEQUENCE
 
     seq1.subscribe(&n_trace, &c_trace, nullptr);
-    if (DEBUG) std::cout << "\nready to go, enable: \n" << std::flush;
     seq1.enable(c0);
 
 }

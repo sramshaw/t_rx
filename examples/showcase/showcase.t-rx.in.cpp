@@ -37,11 +37,11 @@ void tests(){
 
 
 void test_generated_main_loop(){
-  struct { long v; long total; std::array<long,1> totals ={0}; std::array<long,1> totals2 ={0};} c;
+  struct { long v; long total; std::array<long,1> totals ={0};} c;
   c.v= 0;
   c.total = 0;
   c.totals[0] = 0;
-  c.totals2[0] = 0;
+  std::array<long,1> totals2 ={0};
 
   auto start_time = std::chrono::high_resolution_clock::now();
   {
@@ -53,8 +53,8 @@ void test_generated_main_loop(){
           scan c0->total, (acc,n) => { acc += n;  return acc;  }, acc => acc
           do     acc => std::cout << ", _acc = " << acc         << std::flush
           scan c0->totals[0], (acc,n) => { acc += n;  return acc;  }, acc => acc
-          do     acc => std::cout << ", _acc = " << acc         << std::flush
-          scan c0->totals2[..], (acc,n) => { acc += n;  return acc;  }, acc => acc
+          do     acc => std::cout << ", _acc2 = " << acc         << std::flush
+          scan [totals2], (acc,n) => { acc += n;  return acc;  }, acc => acc
           do     acc => std::cout << ", accs = " << acc << "\n" << std::flush
           select x => x
           select x => { return x *2 ;}
@@ -69,7 +69,7 @@ void test_generated_main_loop(){
           select x => (x + 2)
           endObservable
           ;
-#undef SEQUENCE;
+#undef SEQUENCE
 
       seq16.subscribe(&n_trace, &c_trace, nullptr);
       if (DEBUG) std::cout << "\nready to go, enable: \n" << std::flush;
