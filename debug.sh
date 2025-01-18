@@ -1,1 +1,3 @@
-python3 -s ./scripts/tirnsr_rx.py . && sh -c 'cd ./examples/pythagorian/ && ./debug.sh' && sh -c 'cd ./examples/showcase/ && ./debug.sh' 
+python3 -s ./scripts/tirnsr_rx.py . && \
+(cd ./examples/pythagorian/ && ./debug.sh) && \
+(cd ./examples/showcase/ && ./debug.sh)
