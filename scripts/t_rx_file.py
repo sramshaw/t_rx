@@ -125,13 +125,15 @@ def generateTypes(name, operators, parent_type):
     ret = "".join([generateTypes_i_o(i,o,name) for i,o in enumerate(operators)])
     types_list = ( [parent_type]
            + [name+"_type" + str(i) for i,o in enumerate(operators)] 
-           + [name+"_"+str(i)+"_sub_array_type" for i,o in enumerate(operators) if hasattr(o,"ops")]
-           + [o.my_capture_type  for i,o in enumerate(operators) if hasattr(o,"my_capture_type")]
+           + [(name+"_"+str(i)+"_sub_array_type") if hasattr(o,"ops") else
+              (o.my_capture_type)                 if hasattr(o,"my_capture_type") else ""
+               for i,o in enumerate(operators) if hasattr(o,'internal_dcl')]
            )
     ret = ret + "\ntypedef "+name+"<" + ",".join(types_list) +"> "+name+"_sub;"
     return [ret,name+"_sub("+",".join(
-        [name+"_sequence"+str(i)+"_array" for i,o in enumerate(operators) if hasattr(o,"ops")]
-        + [o.special_capture for i,o in enumerate(operators) if hasattr(o,"special_capture")]
+        [(name+"_sequence"+str(i)+"_array")  if hasattr(o,"ops") else
+         (o.special_capture)                 if hasattr(o,"special_capture") else ""
+         for i,o in enumerate(operators) if hasattr(o,'internal_dcl')]
         )+")"]
 
 def clang_save(filename,txt):

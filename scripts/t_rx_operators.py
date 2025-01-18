@@ -53,7 +53,7 @@ def create_class(name,capture,f_ops):
               + '\n      //if (DEBUG) std::cout << \"binding seqs!! \\n\" << std::flush;'
               + '\n      for(auto& element: repo%(i)d)'
               + '\n          element.subscribe(n,c,this);'
-              + '\n  };') %locals() for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')])
+              + '\n  };') %locals() for i,o in enumerate(f_ops) if hasattr(o,'ops')])
               + '\n  _c0 ' + capture +';'
               + '\n  int indexed;'
               + '\n  typedef type' + str(s-1) + " output;"
