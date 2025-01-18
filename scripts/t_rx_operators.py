@@ -24,18 +24,25 @@ def create_class(name,capture,f_ops):
               + '\n      for(auto& element: repo%(i)d) {'
               + '\n          if (!element.enabled) {'
               + '\n              element.exit_obj=this;'
-              + '\n              //std::cout << \"assign work @\"<<i<<\" \\n\" << std::flush;'
+              + '\n              std::cout << \"assign work @\"<<i<<\" \\n\" << std::flush;'
               + '\n              return element.enable(x,i);'
+              + '\n          }'
+              + '\n          else'
+              + '\n          {'
+              + '\n              std::cout << \"skipping work @\"<<i<<\" \\n\" << std::flush;'
               + '\n          }'
               + '\n          i++;'
               + '\n      }'
               + '\n      return false;'
               + '\n  };'
               + '\n  inline void disableFrom%(i)d() {'
+              + '\n      auto i =0;'
               + '\n      for(auto& element: repo%(i)d) {'
-              + '\n          if (element.exit_obj==this) {'
+              + '\n          if (element.exit_obj==this && element.enabled) {'
+              + '\n              std::cout << \"disable work @\"<<i<<\" \\n\" << std::flush;'
               + '\n              return element.disable();'
               + '\n          }'
+              + '\n          i++;'
               + '\n      }'
               + '\n  };'
               + '\n  void unbind%(i)d () {'
@@ -76,8 +83,9 @@ def create_class(name,capture,f_ops):
     ret = (ret+ "\n" 
   "  // end of sequence logic\n"
   "  inline void transform_next" + str(s) + "    () { this->direct_exit_next(_exchange.type_" + str(s-1) + "); }\n"
-  "  inline void transform_complete" + str(s) + "() {"
-  "/*auto dispose*/    disable();"
+  "  inline void transform_complete" + str(s) + "() {\n"
+  "    std::cout << \"auto dispose \\n\" << std::flush;\n"
+  "    disable();"
   "    this->direct_exit_complete(); "
   "  }\n};\n")
     return ret
@@ -260,9 +268,8 @@ class selectmany:
         self.ondisable = "\n    disableFrom%(i)d();" %locals()
         self.trampoline =   (
   "  decltype(" + maxConcurrent + ") counter%(i)d;\n"
-  "  bool bool%(i)d;\n"
-  "  inline void transform_next%(i)d()     {bool%(i)d=false; bool success = assign_work%(i)d(_exchange.type_%(deci)d);if (success) counter%(i)d++; /*std::cout<<\""+name+"\"<<\" count up \"<<counter%(i)d<<\"\\n\"<<std::flush;*/}\n"
-  "  inline void transform_complete%(i)d() { bool%(i)d = true;if(!counter%(i)d<=0)               return; transform_complete%(inci)d();}\n"
+  "  inline void transform_next%(i)d()     {\nbool success = assign_work%(i)d(_exchange.type_%(deci)d);\nif (success) counter%(i)d++; /*std::cout<<\""+name+"\"<<\" count up \"<<counter%(i)d<<\"\\n\"<<std::flush;*/}\n"
+  "  inline void transform_complete%(i)d() {\ntransform_complete%(inci)d();\n}\n"
   "  static void receive_next%(i)d(type%(i)d v%(i)d, void *obj) {"
   "    //std::cout << \"receive next%(i)d \" << v%(i)d << \"\\n\" << std::flush;\n"
   "    auto self = static_cast<%(name)s *>(obj);"
@@ -290,6 +297,7 @@ class scan:
         index   = index + 1
         funcName        = "%(name)s_fs%(i)d" %locals() 
         self.my_capture_type = "decltype(" +special_capture +')'
+        self.special_capture = special_capture
         deci            = i-1
         inci            = i+1
         transformed = expand_anon_types(funcBody) % locals() # used for scan operator
@@ -302,30 +310,6 @@ class scan:
         self.outputType =('typedef decltype(%(funcName)s<%(captype)s,decltype(%(special_capture)s),' + name + '_type%(deci)d>(%(captype)s{},%(special_capture)s,0,'+name+'_type%(deci)d{})) ' + name + '_type%(i)d;') %locals()
         self.internal_dcl = special_capture +'_t'
         self.index=i
-
-# class scan:
-#     def __init__(self, op, name, captype,capture, var, funcBody):
-#         index = op[3]
-#         print(op[4][2])
-#         #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
-#         i       = index
-#         deci    = i+1
-#         index   = index + 1
-#         funcName        = "%(name)s_fs%(i)d" %locals() 
-#         deci            = i-1
-#         inci            = i+1
-#         transformed = expand_anon_types(funcBody) % locals() # used for scan operator
-#         self.external   = 'template<typename _c0, typename type%(deci)d> auto %(funcName)s (_c0 %(capture)s, type%(deci)d %(var)s)%(transformed)s' % locals()
-#         self.straight   =''
-#         self.trampoline =(
-#     'inline void transform_next%(i)d()     { _exchange.type_%(i)d = %(funcName)s(%(capture)s,_exchange.type_%(deci)d); transform_next%(inci)d(); }\n'
-#   '  inline void transform_complete%(i)d() { transform_complete%(inci)d(); }'
-#   "  inline void init_higher_order%(i)d()   { counter%(i)d=0; bind%(i)d(&receive_next%(i)d, &receive_complete%(i)d);}"
-#             ) %locals()
-#         self.outputType =('typedef decltype(%(funcName)s<%(captype)s,' + name + '_type%(deci)d>(%(captype)s{},'+name+'_type%(deci)d{})) ' + name + '_type%(i)d;') %locals()
-#         self.internal_dcl = 'accumulator_t'
-#         self.internal_enable = 'init_higher_order' + str(i) + "();"
-#         self.index=i
 
 class endSequence:
     def __init__(self, op,name):

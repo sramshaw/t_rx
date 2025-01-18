@@ -113,7 +113,7 @@ def generateTypes_i_o(i,o,name):
     ret = ""
     if hasattr(o,"ops"):
         sub = generateTypes(name+ "_" + str(i), o.ops, name+"_type"+str(i-1))
-        ret = ret + sub[0]
+        ret = ret + sub[0] 
         array = "\nstd::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+"_sequence"+str(i)+"_array={"+",".join(["[_creator"+str(i)+"_]" for j in range(0, int(o.maxConcurrent))])+"};"
         array_type = "\ntypedef std::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+ "_" + str(i)+"_sub_array_type;"
         ret = ret + array.replace('[_creator'+str(i)+'_]',sub[1])
@@ -129,7 +129,10 @@ def generateTypes(name, operators, parent_type):
            + [o.my_capture_type  for i,o in enumerate(operators) if hasattr(o,"my_capture_type")]
            )
     ret = ret + "\ntypedef "+name+"<" + ",".join(types_list) +"> "+name+"_sub;"
-    return [ret,name+"_sub("+",".join([name+"_sequence"+str(i)+"_array" for i,o in enumerate(operators) if hasattr(o,"ops")])+")"]
+    return [ret,name+"_sub("+",".join(
+        [name+"_sequence"+str(i)+"_array" for i,o in enumerate(operators) if hasattr(o,"ops")]
+        + [o.special_capture for i,o in enumerate(operators) if hasattr(o,"special_capture")]
+        )+")"]
 
 def clang_save(filename,txt):
     with open(filename,"w") as f:
