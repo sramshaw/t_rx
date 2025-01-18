@@ -13,30 +13,10 @@ extern "C" {
 #define COMPLETED           true
 #define PROOF_BY_MESSAGE    true
 
-static void nothing(){}
-void tests();
-
-int main(){
-    tests();
-}
-
-///////////////////////// GENERATED CODE UTILITIES
-// utils for visualizing the code generated
 static void n_trace(long n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n << "\n" << std::flush;}
 static void c_trace(void* obj)      {if (COMPLETED) std::cout << "[TRACE] seq > completed\n" << std::flush;  }
 
-///////////////////////// TESTS
-void test_generated_main_loop();
-void tests(){
-    if (DEBUG) std::cout << "\n\n//// START OF TESTS /////\n";
-    {
-    	test_generated_main_loop();
-        if (DEBUG) std::cout << "************* end test ************\n" << std::flush;
-    }
-}
-
-
-void test_generated_main_loop(){
+int main(){
   struct { long v; long total; std::array<long,1> totals ={0};} c;
   c.v= 0;
   c.total = 0;
