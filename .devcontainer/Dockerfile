@@ -17,7 +17,7 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends   clang-format fswatch default-jre \
                                                     build-essential libncurses-dev bison flex libssl-dev libelf-dev gcc-multilib
-
+# https://tutorialforlinux.com/2023/07/28/gcc-13-2-debian-bookworm-installation-step-by-step/3/
 WORKDIR /home/vscode/Downloads
 RUN wget https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.gz \
     && tar xvzf gcc-13.2.0.tar.gz
