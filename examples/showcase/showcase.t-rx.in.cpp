@@ -4,6 +4,7 @@ extern "C" {
 
 #include <fstream>
 #include <iostream>
+#include <array>
 #include <chrono>
 #include "tick1.hpp"
 #include "../../include/trx.hpp"
@@ -12,6 +13,8 @@ extern "C" {
 #define DEBUG               true
 #define COMPLETED           true
 #define PROOF_BY_MESSAGE    true
+
+using namespace std;
 
 static void n_trace(long n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n << "\n" << std::flush;}
 static void c_trace(void* obj)      {if (COMPLETED) std::cout << "[TRACE] seq > completed\n" << std::flush;  }
@@ -68,6 +71,22 @@ int main(){
   }
   auto end_time = std::chrono::high_resolution_clock::now();
   auto time = end_time - start_time;
+
+//     struct Spec
+//     {
+//         int val;
+//         double otherVal;
+//     };
+//   Spec specData[] = { 
+//         { .val = 1, .otherVal = 3.56 }, 
+//         { .val = 3, .otherVal = 9.88 },
+//     } ;
+//     auto tu =  {0, 1, 2};
+//     array<int,3> tt{{1,2,3}};
+    // auto t ={ 
+    //     { .val = 1, .otherVal = 3.56 }, 
+    //     { .val = 3, .otherVal = 9.88 },
+    // } ;
 
 
   if (PROOF_BY_MESSAGE) std::cout   << "\ndone in time: \n"

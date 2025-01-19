@@ -1,22 +1,11 @@
 #include <string>
 #include <cassert>
 
-#define SMART_ASSERT(expr, message) \
+#define SMART_ASSERT(expr, message, val) \
     do { \
         if (!(expr)) { \
             std::cerr << "Assertion failed: " << #expr << std::endl; \
-            std::cerr << "Message: " << message << std::endl; \
-            std::cerr << "File: " << __FILE__ << std::endl; \
-            std::cerr << "Line: " << __LINE__ << std::endl; \
-            std::abort(); \
-        } \
-    } while (false)
-
-#define SMART_ASSERT_CRASH(expr, message) \
-    do { \
-        if (!(expr)) { \
-            std::cerr << "Assertion failed: " << #expr << std::endl; \
-            std::cerr << "Message: " << message << std::endl; \
+            std::cerr << "Message: " << message << ", values :" << val  << std::endl; \
             std::cerr << "File: " << __FILE__ << std::endl; \
             std::cerr << "Line: " << __LINE__ << std::endl; \
             return 1; \

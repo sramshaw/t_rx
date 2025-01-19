@@ -21,6 +21,6 @@ int main(){
     seq1.enable(c0);
     std::cout << "[COUNT] >  "  << c.count <<"\n" << std::flush;
     std::cout << "[RESULT] >  " << c.result <<"\n" << std::flush;
-    SMART_ASSERT(c.result == 12, "the last value expected is 12");
-    SMART_ASSERT(c.count == 3, "the count of emitted values from 10 to 12 is 3");
+    SMART_ASSERT(c.result == 12, "the last value expected is 12 " , c.result);
+    SMART_ASSERT(c.count == 3, "the count of emitted values from 10 to 12 is 3", c.count);
 }
