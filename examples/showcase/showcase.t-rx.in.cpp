@@ -18,10 +18,7 @@ static void n_trace(long n, void* obj) {if (DEBUG) std::cout << "[TRACE] " << n 
 static void c_trace(void* obj)      {if (COMPLETED) std::cout << "[TRACE] seq > completed\n" << std::flush;  }
 
 int main(){
-  struct { long v; long total; std::array<long,1> totals ={0};} c;
-  c.v= 0;
-  c.total = 0;
-  c.totals[0] = 0;
+  struct { long v = 0; long total = 0; std::array<long,1> totals ={0};} c;
   std::array<long,1> totals2 ={0};
 
   auto start_time = std::chrono::high_resolution_clock::now();

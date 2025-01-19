@@ -7,7 +7,7 @@ extern "C" {
 static void n_trace(unsigned n, void* obj) {std::cout << "[TRACE] " << n << "\n" << std::flush;}
 static void c_trace(void* obj)         {std::cout << "[TRACE] seq > completed\n" << std::flush;  }
 int main(){
-    struct { long v;} c;
+    struct { long result;} c;
     std::array<long,1> totals2 ={0};
     auto c0= &c;
 #define SEQUENCE
@@ -18,11 +18,13 @@ int main(){
         selectmany 1, [c1] => fromRange<unsigned>(1, 2)
             do     x => std::cout << "_x = " << x       << "\n" << std::flush
             endObservable
+        do     y => c0->result =y
         endObservable
         ;
 #undef SEQUENCE
 
     seq1.subscribe(&n_trace, &c_trace, nullptr);
     seq1.enable(c0);
+    SMART_ASSERT(true ,, "build test so that generated code handles both scan and selectmany in the same sequence");
 
 }
