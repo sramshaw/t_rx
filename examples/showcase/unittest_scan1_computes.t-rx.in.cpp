@@ -2,14 +2,16 @@ extern "C" {
     #include<stdio.h>
 }
 #include <iostream>
+//leave an empty line under the include below
 #include "../../include/trx.hpp"
+
 
 static void n_trace(long n, void* obj) {std::cout << "[TRACE] " << n << "\n" << std::flush;}
 static void c_trace(void* obj)         {std::cout << "[TRACE] seq > completed\n" << std::flush;  }
 
 
 int main(){
-    struct { long result;} c;
+    struct { long result;} c = {0};
     std::array<long,1> totals2 ={0};
     auto c0= &c;
 #define SEQUENCE
@@ -24,5 +26,5 @@ int main(){
     seq1.subscribe(&n_trace, c_trace, nullptr);
     seq1.enable(c0);
     std::cout << "[RESULT] >  " << c.result <<"\n" << std::flush;
-    SMART_ASSERT(c.result == 3, "this is basic scan computation to accumulate 1 and 2, =3");
+    SMART_ASSERT(c.result, == 3, "this is basic scan computation to accumulate 1 and 2, =3");
 }

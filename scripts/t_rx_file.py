@@ -177,7 +177,7 @@ def generateCodeForOneFile(fullname):
     cppname = filename + ".t-rx.out.cpp"
  
     original = getContents(fullname)
-    includePattern = "(.*)([\/\\\\\\\"]trx\.hpp\")(.*)"
+    includePattern = "(.*)([\/\\\\\\\"]trx\.hpp\"\n)(.*)"
     r = re.search(includePattern,original,re.DOTALL)
     if not r:
         print("[" + fullname + "]----------------------- does not contain any Rx")    
@@ -185,7 +185,7 @@ def generateCodeForOneFile(fullname):
     a = r.group(1)
     b = r.group(2)
     c = r.group(3)
-    original = a + b + "\n#include \"" + os.path.basename(hppname) + "\""+c
+    original = a + b + "#include \"" + os.path.basename(hppname) + "\""+c
     
    
     print("[" + fullname + "]----------------------- PARSE")    
