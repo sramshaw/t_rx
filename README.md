@@ -140,7 +140,8 @@ Here is an interesting website for working on the parser with regex, and expecia
   - use test maste
   - generate benchmarks for alternatives of implementation
   - review [asymptotic scaling](https://github.com/NAThompson/using_googlebenchmark)?
-
+- long term
+  - chaining various wasm modules together using C++ t_rx based plumbing
 
 ### design
 
