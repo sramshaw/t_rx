@@ -2,6 +2,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debugger: tirnsr_rx.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/tirnsr_rx.py",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/examples/pythagorian/"
+            ]
+        },
+        {
             "name": "Debug pythagorian",
             "type": "cppdbg",
             "request": "launch",
