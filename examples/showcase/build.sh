@@ -12,7 +12,7 @@ for fullname in *.t-rx.out.cpp; do
     echo 1, $fullname
     echo 2, $basename
     rm $basename.autorun -f
-    g++ -std=c++20 -I .   $basename.t-rx.out.cpp  -o $basename.autorun
+    g++ -std=c++20 -I .   $basename.t-rx.out.cpp  -o $basename.autorun -pedantic
     echo $?
     ./$basename.autorun
     echo

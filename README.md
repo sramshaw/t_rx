@@ -36,7 +36,7 @@ Having focused on small C systems for the better part of a decade, then having p
 The project aims at small programs running on micro processors, say for instance a 16bit processor with 64KB of program space. The main behavior will remain single core and single threaded.
 
 ### Architecture
-The main contribution required to make event handling palatable to small systems is a brutal shrinking of the executable. RxCpp will take most likely a minimum of 300KB for a basic implementation, for instance look at the pythagorian example. 
+The main contribution required to make event handling palatable to small systems is a brutal shrinking of the executable. RxCpp will take most likely a minimum of 300KB for a basic implementation, for instance look at the [pythagorian example](https://github.com/ReactiveX/RxCpp/blob/main/Rx/v2/examples/pythagorian/main.cpp). 
 Here we achieve shrinking by simplifying the sequences and observables at compile time.
 
 ### Design decisions
@@ -54,12 +54,12 @@ the demo can run by running `./build_and_run.sh`
 ### Development
 
 If you are modifying files and wanting to see in vscode terminal the results of your changes live,
-run `./build_and_dev.sh` in your terminal, it will monitor changes to folders listed, and run the ```./run.sh``` script which rebuilds all, applying the preprocessing to the files ending in ```t-rx.in.cpp``` .
+run `./dev.sh` in your terminal, it will monitor changes to folders listed, and run the ```./run.sh``` script which rebuilds all, applying the preprocessing to the files ending in ```t-rx.in.cpp``` .
 
 ### Status : in construction
-The pythagorian example works, the showcase does not yet.
-The capture of lambdas is already done.
-Work needed on observables and observers, mostly wiring, revisiting this via UML sequence diagrams. 
+The pythagorian example works, the showcase does too. This is LINQ type behaviors with sources being immediate. There is no stack limitations at this point.
+The capture of lambdas is already done mostly for select and do operators.
+Work needed on the push story with buffering to allow backpressure at the sources and temporary buffering by a subscriber.
 
 ### Notes
 

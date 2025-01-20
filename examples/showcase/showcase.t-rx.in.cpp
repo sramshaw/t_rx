@@ -26,7 +26,15 @@ int main(){
       auto c0= &c;
 
 #define SEQUENCE
+    // one key element of Rx/LINQ is conciseness, which requires efficient expression in one liners
+    // since this is a different language not trying to fit the C++ language syntax everywhere,
+    // and based on the C# syntax, the parenthesis of C# are also removed to be even easier to type
+    // C#'s anonymous objects are replaced as much as possible by C++ unnamed structs objects
     sequence seq16 = [c0] => fromPublisher<unsigned> (tick1)
+          // introducing C# like lambda via '=>' with corresponding features for enabling concise one liners 
+          // - no need for curly brackets
+          // - support for compound literals as per https://godbolt.org/z/T8cKe3Mb3
+          // - type inference
           do     x => std::cout << "_n = " << x                 << std::flush
           scan c0->total, (acc,n) => { acc += n;  return acc;  }, acc => acc
           do     acc => std::cout << ", _acc = " << acc         << std::flush
@@ -36,7 +44,14 @@ int main(){
           do     acc => std::cout << ", accs = " << acc << "\n" << std::flush
           select x => x
           select x => { return x *2 ;}
-          select x => { return { c =  x +2}; }
+          //this next line would trigger warnings for coumpound-literals when using '-pedantic'  but works with gcc
+          select x => (struct { long c ;}){x +2}
+          select x => x.c
+          // so this language introduces a version of this without warnings
+          select x => { return {c = x +2}; }
+          select x => x.c
+          // another alternative
+          select x => struct {c = x +2}
           select x => x.c
           select x => (long)x + 2
           select x => struct { a = x, b = 1}
