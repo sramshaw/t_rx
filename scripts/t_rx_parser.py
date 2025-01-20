@@ -5,7 +5,7 @@ def no_capture(mask):       # for regex
 
 
 def getPatterns():
-    return "(.*)(" + "|".join([no_capture(o[1]) for o in getRxGrammar()])  + ")(.*)"
+    return "(.*)(" + "|".join([no_capture(o[1]) if o[1].startswith("from") else "\n[\t ]*"+no_capture(o[1]) for o in getRxGrammar()])  + ")(.*)"
 
 def getall(txt,capture):
     r = re.search(capture,txt,re.DOTALL)

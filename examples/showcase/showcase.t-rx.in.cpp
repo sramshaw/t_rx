@@ -45,7 +45,7 @@ int main(){
           select x => x
           select x => { return x *2 ;}
           //this next line would trigger warnings for coumpound-literals when using '-pedantic'  but works with gcc
-          //   s elect x => (struct { long c ;}){x +2}
+          //   select x => (struct { long c ;}){x +2}
           // so this language introduces a version of this without warnings
           select x => { return {c = x +2}; }
           select x => x.c

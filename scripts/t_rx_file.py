@@ -168,7 +168,7 @@ def getCpp(operators,codeBefore,codeAfter,originalSequenceCode,hppname):
     rootOperator = operators[0]
     name = rootOperator.name
     #cpp = '#include "../../include/trx.hpp"\n#include "' + hppname + '"\n\n'
-    cpp = codeBefore + "/*" + originalSequenceCode + "*/\n  T_RX_CREATE_" + name + "()\n" + codeAfter
+    cpp = codeBefore + "\n/*" + originalSequenceCode[1:] + "*/    T_RX_CREATE_" + name + "()\n" + codeAfter
     return cpp
 
 def generateCodeForOneFile(fullname):
