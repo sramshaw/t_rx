@@ -1,8 +1,8 @@
 ## [ti-re:ks] The tiny C/C++ Rx implementation
 ### Foreword
-T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It offers a flatmap and fluent way to combine lambdas. All memory is reserved on the stack, nothing on the heap.
+T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It offers a flatmap and fluent way to combine C# inspired lambdas. All memory is reserved on the stack, nothing on the heap.
 
-This is aiming at programs that need to fit on 32kB (Ex: single Parallela core).
+This is aiming at programs that need to fit on 32kB (Ex: single [Parallela](https://www.adapteva.com/parallella/) core).
  
 ReactiveX [Rx] is a powerful language that can change, where applicable, the way we code event based systems. It can and has been used in place of what would have been accomplished via small interpreters and/or state machines.
 
@@ -23,6 +23,7 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [release notes](#release-notes)
   - [coming next](#coming-next)
   - [design](#design)
+    - [pythagorian example, inspired by RxCpp's example, which this design needs to beat by a lot to be worth using](#pythagorian-example-inspired-by-rxcpps-example-which-this-design-needs-to-beat-by-a-lot-to-be-worth-using)
 
 
 ### Goal
@@ -165,10 +166,10 @@ For selectmany, the issue comes with what could lead to an automatic allocation 
 Instead today we would announce the total instances needed for the second selectmany, for instance: 5.
 In the case of scan, the issue has to do with how to infer the type of accumulator and also initialize the member variable from a lambda in place. I am not sure if that is possible. Instead, a direct capture is done. Direct captures could be made available in other operators as they are easy to handle, but not recommended for unknown uses. not yet time to decide.
 
-
+#### pythagorian example, inspired by [RxCpp's example](https://github.com/ReactiveX/RxCpp/blob/main/Rx/v2/examples/pythagorian/main.cpp), which this design needs to beat by a lot to be worth using
 
 ```C
-  {
+  { // 
       auto c0= &c;
       sequence seq14 = [c0] => fromRange<unsigned>(1,999)
           select z1 => struct {z = z1, c = c0}
