@@ -137,7 +137,7 @@ Here is an interesting website for working on the parser with regex, and expecia
   - a new operator withLogic put anywhere allows other logic to be serviced (used here to fake data)
 - [RESEARCH] user ease of adoption, more C# like features
   - attempt to map debugging experience running on the transformed files back to displaying the original file
-    - need to modify the symbols ?
+    - most promising: https://stackoverflow.com/questions/42234485/showing-original-source-when-debugging-generated-code-in-gdb
   - color coding of sequence
     - put the sequence in a comment to avoid intellisense ?
       - example off [better-comments](https://github.com/aaron-bond/better-comments/blob/master/src/extension.ts) extension plugin for vscode 
