@@ -47,7 +47,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/examples/showcase/unit-test-debug",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,

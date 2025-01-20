@@ -291,7 +291,6 @@ class scan:
     def __init__(self, op, name, captype,capture, var, funcBody, special_capture):
         index = op[3]
         print(op[4][2])
-        #print 'b4:\n' + funcBody+ '\n  after:\n'+ transformed
         i       = index
         deci    = i+1
         index   = index + 1

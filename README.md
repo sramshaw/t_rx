@@ -100,7 +100,7 @@ Here is an interesting website for working on the parser with regex, and expecia
 
 
 ### release notes
-- v0.1 - the original design has the following decomposition of features:
+- v0.1 - the original LINQ like design has the following decomposition of features:
   - sequence class that
     - concatenates most of the operators using a union variable to hold the transformed values over time
     - branches out values to sub sequences as needed for selectmany (aka flatmap)
@@ -117,11 +117,10 @@ Here is an interesting website for working on the parser with regex, and expecia
   - note that it is possible to abstract more parts of the system to have a manager that is more generic, and therefore reusable when the templates are redundant
     - this is no likely though, and still requires more execution
 -  v0.3
-   -  scan opertor using simple ints on capture no issue, but limited use when nested in selectmany
-   -  scan using accumulator pool, issue passing the pool via capture
+   -  scan0, sacn2: operator using simple ints on capture no issue, but limited use when nested in selectmany
+   -  scan1: use explicitly captured accumulator pool, (had issue passing the pool via top of sequence capture like for scan0 and scan2)
       -  the anonymous struct approach leads to union issue due to non-trivial constructors
-      -  call for passing the pools explicitely, which should not be too hard, like selectmany
-      -  partial implementation (not compiling yet) with capture of array of accumulators, missing the init of the array of sequences
+   -  fixes, now captured in unit tests
 
 ### coming next
 - [ON HOLD]: gcc13.1+ for C++20 support
@@ -131,7 +130,12 @@ Here is an interesting website for working on the parser with regex, and expecia
   - string [starts_with and ends_with operators](https://github.com/AnthonyCalandra/modern-cpp-features/blob/master/CPP20.md#starts_with-and-ends_with-on-strings), for rx/linq concise filtering in where operator etc...
   - easier creation of arrays as auto vars initialized with [to_array](https://en.cppreference.com/w/cpp/container/array/to_array)
   - maybe use of [generators (C++23)](https://en.cppreference.com/w/cpp/header/generator) eventually ? though it is not useful for linq like behavior here it seems
-- user ease of adoption, more C# like features
+- [READY FOR IMPLEMENTATION] ReactiveX push behavior, using a 
+  - forever loop as background task to advance
+  - sources push to buffers (optimal circular buffers)
+  - operator fromCircular(get function) registers to the advance mechanism
+  - a new operator withLogic put anywhere allows other logic to be serviced (used here to fake data)
+- [RESEARCH] user ease of adoption, more C# like features
   - attempt to map debugging experience running on the transformed files back to displaying the original file
     - need to modify the symbols ?
   - color coding of sequence
@@ -142,11 +146,11 @@ Here is an interesting website for working on the parser with regex, and expecia
       - new anchor \`\`\`seq
   - more operators: buffer
   - back pressure support via circular buffer, whichever [most standard one c++ provides (is libc++ too much?)](https://stackoverflow.com/a/79102831/19037406) on top of std array would be best
-- use google test for tests, and [google benchmark](https://github.com/google/benchmark)
+- [NEXT] use google test for tests, and [google benchmark](https://github.com/google/benchmark)
   - use test maste
   - generate benchmarks for alternatives of implementation
   - review [asymptotic scaling](https://github.com/NAThompson/using_googlebenchmark)?
-- long term
+- [OBJECTIVES] long term
   - minimal code for embedded or containers
     - chaining various wasm modules together using C++ t_rx based plumbing
       - need support for compilation to wasm 
