@@ -40,7 +40,7 @@ def create_class(name,capture,f_ops):
               + '\n      for(auto& element: repo%(i)d) {'
               + '\n          if (element.exit_obj==this && element.enabled) {'
               + '\n              std::cout << \"disable work @\"<<i<<\" \\n\" << std::flush;'
-              + '\n              return element.disable();'
+              + '\n              element.disable();'
               + '\n          }'
               + '\n          i++;'
               + '\n      }'
