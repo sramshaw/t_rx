@@ -60,6 +60,10 @@ def getRxGrammar():
         'selectmany\s+(\w+)\s*,\s*\[\s*(\w*)\]\s*=>',
         "",
         "selectmany(op,name,a(1),a(2))"], 
+    [   "merge",
+        'merge\s+\[\s*(\w*)\s*\]\s*=>',
+        "",
+        "merge(op,name,a(1))"], 
     [   "where0",
         "where\s+(\w+)\s*=>\s*\{",
         "(.*)\}\s*",
@@ -116,6 +120,10 @@ def getRxGrammar():
         "fromRange\<(\w+)\>",
         "\s*\((.+),(.+)\)\s*",
         "fromRange(op,a(1),b(1),b(2),name,captype,capture)"],
+    [   "never",
+        "fromNever\<(\w+)\>",
+        "\s*\(\s*)\s*",
+        "never(op,a(1),name)"],
     ]
 
 

@@ -11,8 +11,9 @@ def getEntity(op,name,captype,capture):
 def create_class(name,capture,f_ops):
     s = len(f_ops)
     ret = "\n".join([create_class(name+ "_" + str(i),o.capture,o.ops) for i,o in enumerate(f_ops) if hasattr(o,"ops")])
-    ret = ret + ('\ntemplate<typename _c0, ' + ",".join(
-                ["typename type" + str(i) for i in range(0,s)]
+    ret = ret + ('\n ' + ",".join(
+                ["template<typename _c0"]
+              + ["typename type" + str(i) for i in range(0,s)]
               + ["typename " + (o.internal_dcl + str(i)) for i,o in enumerate(f_ops) if hasattr(o,'internal_dcl')]
               ) + ">\n")
     ret =(ret + 'class ' + name + ':public observable<type' + str(s-1) + '>{\npublic:\n ' 
@@ -144,6 +145,23 @@ class fromRange:
   '  inline void from_connect   (void (*n)('+theType+',void*), void(*c)(void*), void* self){'
      'for ('+theType+' i = '+arg1+';i<='+arg2+' && this->enabled;i++){'
      '_exchange.type_%(i)d = i;transform_next%(inci)d(); }transform_complete%(inci)d();}\n'
+  '  inline void from_disconnect(void (*n)('+theType+',void*), void(*c)(void*), void* self){}\n'
+  '  static void transform_next0(type%(i)d v%(i)d, void *obj) {}\n'
+  '  static void transform_complete0(void *obj)       {}\n') %locals()
+        self.straight=''
+        self.trampoline = self.common
+        self.outputType='typedef ' + theType + " " + seq_name + '_type' + str(i) + ';'
+        self.index=i
+
+class never:
+    def __init__(self, op, theType, seq_name):
+        print(op[4][2])
+        index = op[3]
+        i       = index
+        inci    = i + 1
+        index   = index + 1
+        self.common= (
+  '  inline void from_connect   (void (*n)('+theType+',void*), void(*c)(void*), void* self){}\n'
   '  inline void from_disconnect(void (*n)('+theType+',void*), void(*c)(void*), void* self){}\n'
   '  static void transform_next0(type%(i)d v%(i)d, void *obj) {}\n'
   '  static void transform_complete0(void *obj)       {}\n') %locals()
@@ -284,6 +302,59 @@ class selectmany:
         self.outputType =('typedef ' + subName + '_sub::output ' + name+ '_type%(i)d;') %locals()
         self.internal_dcl = 'subsequence_array_t'
         self.internal_setup = 'init_higher_order' + str(i) + "();"
+        self.index=i
+        self.maxConcurrent = maxConcurrent
+
+class merge:
+    def __init__(self, op, name, var): #, subseq):
+        print(op[4][2])
+        index = op[3]
+        i = index
+        maxConcurrent = "1"
+        deci            = i - 1
+        index = index +1
+        subName         = "%(name)s_%(i)d" %locals() 
+        index = 0
+        self.ops = [getEntity(o,subName, name+"_type" + str(deci),var) for o in op[5]]
+        self.class_definition = create_class(name,var,self.ops)
+        self.capture = var
+        index = i + 1
+        inci            = i + 1
+        deci            = i - 1
+        self.external   = ''
+        self.ondisable = "\n    disableFrom%(i)d();" %locals()
+        self.trampoline =   (
+  "  std::array<bool,2> upstream_completed%(i)d={};\n"
+  "  inline void transform_next%(i)d()     {\n"
+  "    transform_next%(inci)d();\n"
+  "  }\n"
+  "  inline void transform_complete%(i)d() {\n"
+  "    upstream_completed%(i)d[0]=true;\n"
+  "    if (upstream_completed%(i)d[1]) transform_complete%(inci)d();\n"
+  "  }\n"
+  "  static void receive_next%(i)d(type%(i)d v%(i)d, void *obj) {"
+  "    //std::cout << \"receive next%(i)d \" << v%(i)d << \"\\n\" << std::flush;\n"
+  "    auto self = static_cast<%(name)s *>(obj);"
+  "    self->_exchange.type_%(i)d = v%(i)d;"
+  "    self->transform_next%(inci)d();"
+  "  }\n"
+  "  static void receive_complete%(i)d(void *obj) {\n"
+  "    auto self = static_cast<%(name)s *>(obj);"
+  "    self->upstream_completed%(i)d[1]=true;\n"
+  "    if (self->upstream_completed%(i)d[0]) self->transform_complete%(inci)d();\n"
+  "  }\n"
+  "  inline void init_higher_order%(i)d()   {\n"
+  "    upstream_completed%(i)d[0]=false;\n"
+  "    upstream_completed%(i)d[1]=false;\n"
+  "    bind%(i)d(&receive_next%(i)d, &receive_complete%(i)d);\n"
+  "    assign_work%(i)d(_exchange.type_%(deci)d);\n"
+  "  }"
+  ) %locals()
+
+        self.straight   = ''
+        self.outputType =('typedef ' + subName + '_sub::output ' + name+ '_type%(i)d;') %locals()
+        self.internal_dcl = 'subsequence_array_t'
+        self.internal_enable = 'init_higher_order' + str(i) + "();"
         self.index=i
         self.maxConcurrent = maxConcurrent
 

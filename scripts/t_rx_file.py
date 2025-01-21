@@ -29,7 +29,7 @@ def reset():
 def countRank(op):
     global rank
     i = rank
-    if op == 'namedSequence' or op == 'selectmany':
+    if op == 'namedSequence' or op == 'selectmany' or op == 'merge':
         rank = rank +1
     if op == 'endSequence':
         rank = rank -1
