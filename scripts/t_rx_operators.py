@@ -25,12 +25,12 @@ def create_class(name,capture,f_ops):
               + '\n      for(auto& element: repo%(i)d) {'
               + '\n          if (!element.enabled) {'
               + '\n              element.exit_obj=this;'
-              + '\n              std::cout << \"assign work @\"<<i<<\" \\n\" << std::flush;'
+              + '\n              if (DEBUG) std::cout << \"assign work @\"<<i<<\" \\n\" << std::flush;'
               + '\n              return element.enable(x,i);'
               + '\n          }'
               + '\n          else'
               + '\n          {'
-              + '\n              std::cout << \"skipping work @\"<<i<<\" \\n\" << std::flush;'
+              + '\n              if (DEBUG) std::cout << \"skipping work @\"<<i<<\" \\n\" << std::flush;'
               + '\n          }'
               + '\n          i++;'
               + '\n      }'
@@ -40,7 +40,7 @@ def create_class(name,capture,f_ops):
               + '\n      auto i =0;'
               + '\n      for(auto& element: repo%(i)d) {'
               + '\n          if (element.exit_obj==this && element.enabled) {'
-              + '\n              std::cout << \"disable work @\"<<i<<\" \\n\" << std::flush;'
+              + '\n              if (DEBUG) std::cout << \"disable work @\"<<i<<\" \\n\" << std::flush;'
               + '\n              element.disable();'
               + '\n          }'
               + '\n          i++;'
@@ -63,7 +63,7 @@ def create_class(name,capture,f_ops):
               + "\n    from_connect   (&transform_next0, &transform_complete0, this); return true;}"
               + "\n  bool enable(_c0 a0) {return enable(a0,0);}" 
               + "\n  void disable()      {"
-              + "\n    //std::cout<<\"disable " + name + "\\n\"<<std::flush;"
+              + "\n    if (DEBUG) std::cout<<\"disable " + name + "\\n\"<<std::flush;"
               + "\n    from_disconnect(&transform_next0, &transform_complete0, this);"
               + "\n    this->enabled = false;"
               + "\n    ".join([o.ondisable for o in f_ops if hasattr(o,'ondisable')])
@@ -85,7 +85,7 @@ def create_class(name,capture,f_ops):
   "  // end of sequence logic\n"
   "  inline void transform_next" + str(s) + "    () { this->direct_exit_next(_exchange.type_" + str(s-1) + "); }\n"
   "  inline void transform_complete" + str(s) + "() {\n"
-  "    std::cout << \"auto dispose \\n\" << std::flush;\n"
+  "    if (DEBUG) std::cout << \"auto dispose \\n\" << std::flush;\n"
   "    disable();"
   "    this->direct_exit_complete(); "
   "  }\n};\n")
@@ -261,7 +261,7 @@ class take:
         self.straight   =''
         self.trampoline =(
   "  decltype(" + count + ") counter%(i)d = 0;\n"
-  'inline void transform_next%(i)d()     { counter%(i)d++; transform_next%(inci)d(); if (counter%(i)d >= ' + count + ') {transform_complete%(i)d(); std::cout<<"was here"; }}\n'
+  'inline void transform_next%(i)d()     { counter%(i)d++; transform_next%(inci)d(); if (counter%(i)d >= ' + count + ') {transform_complete%(i)d();  /*std::cout<<"was here";*/ }}\n'
   '  inline void transform_complete%(i)d() { if(this->enabled)transform_complete%(inci)d(); }'
             ) %locals()
         self.outputType =('typedef ' + name + '_type%(deci)d ' + name + '_type%(i)d;') %locals()

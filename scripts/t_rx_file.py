@@ -152,7 +152,7 @@ def getHpp(operators):
     print(rootOperator)
     print('####----------------')
     name = rootOperator.name
-    ret = "#include <functional>\n#include <array>"
+    ret = "#include <functional>\n#include <array>\n#define DEBUG false\n"
     ret = ret + getStandaloneDeclarations(rootOperator.ops)
     ret = ret + rootOperator.class_definition
     ret = ret + "\n\n #define T_RX_CREATE_" + name + "() \\\n"
