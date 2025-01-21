@@ -122,7 +122,7 @@ def getRxGrammar():
         "fromRange(op,a(1),b(1),b(2),name,captype,capture)"],
     [   "never",
         "fromNever\<(\w+)\>",
-        "\s*\(\s*)\s*",
+        "\s*\(\s*\)\s*",
         "never(op,a(1),name)"],
     ]
 

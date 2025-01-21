@@ -11,10 +11,12 @@ for fullname in *.t-rx.out.cpp; do
     echo "////////////////////  COMPILING $basename //////////////////"
     echo 1, $fullname
     echo 2, $basename
-    rm $basename.autorun -f
     g++ -std=c++20 -I .   $basename.t-rx.out.cpp  -o $basename.autorun -pedantic
     echo $?
     ./$basename.autorun
+    rm $basename.autorun -f
+    rm $basename.t-rx.out.cpp -f
+    rm $basename.t-rx.out.hpp -f
     echo
     echo
     echo
