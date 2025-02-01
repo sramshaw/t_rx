@@ -429,3 +429,13 @@ deactivate stack
 @enduml
 
 ```
+
+### references
+other than known Rx.Net and RxCpp
+https://github.com/Cysharp/R3 (improved over https://github.com/neuecc/UniRx)
+https://github.com/victimsnino/ReactivePlusPlus and https://victimsnino.github.io/ReactivePlusPlus/benchmark
+
+the old https://github.com/ReactiveX/RxCpp/tree/main/Rx/v2/examples/pythagorian
+
+compiler online: https://godbolt.org/
+
