@@ -44,7 +44,7 @@ Here we achieve shrinking by simplifying the sequences and observables at compil
 In  `selectmany` aka flatmap, the upstream value is recaptured (here as azc , then again azcx) to be usable in the sub-sequence.  
 
 ### Example
-Here is how the Pythagorian example is written using t_rx, with the new special keywords {`sequence`, `select`, `do`, `selectmany`, `endObservable`, `fromRange`} :
+Here is how the Pythagorian example is written using t_rx, with the new special keywords {`sequence`, `select`, `do`, `selectmany`, `where`, `endObservable`, `fromRange`} :
 ```C
   { // 
       auto c0= &c;
@@ -69,6 +69,7 @@ Here is how the Pythagorian example is written using t_rx, with the new special 
       seq14.disable();
   }
 ```
+Also there are more operators showcased in unit tests: {`never`, `take`, `scan`, `fromPublisher`}.
 
 
 ### Design decisions
@@ -81,7 +82,9 @@ Here is how the Pythagorian example is written using t_rx, with the new special 
 
 ### Demo
 
-the demos and unit tests will all run via `./run.sh` but the use of 'clear' will only leave pythagorian to show in the console at the end. If you want more, comment line 8 (clear) in the 2 `build.sh` files
+Running this demo now essentially requires to use vscode to use the devcontainer environment. Once you open this repo in vscode, reopen it in the devcontainer. It should build itself as needed.  
+The demos and unit tests will all run via `./run.sh` that will run 2 builds. Because the code generation output is hidden by 'clear' during (successful) preprocessing , only the last build will be visible in the console output in the end. This leaves the pythagorian example be the last one showing ouput. Consider running `build.sh` for each example independently.
+
 
 ### Development
 
@@ -141,8 +144,9 @@ Here is an interesting website for working on the parser with regex, and expecia
 - v0.2 - optimization , this version now merges the managers within the sequence owning the corresponding selectmany logic
   - this reduces the number of indirections
     - seen by smaller binary:
-    >-rwxr-xr-x 1 root   root   18840 Jan 16 23:28 pythagorian.exe.original
-    -rwxr-xr-x 1 root   root   18592 Jan 16 23:27 pythagorian.exe.merge_binding_to_sequence  
+    >-rwxr-xr-x 1 root   root   18840 Jan 16 23:28 pythagorian.exe.original  
+
+    >-rwxr-xr-x 1 root   root   18592 Jan 16 23:27 pythagorian.exe.merge_binding_to_sequence  
     - we can see that ~250 bytes are spared by this, explained by more inlining
   - note that it is possible to abstract more parts of the system to have a manager that is more generic, and therefore reusable when the templates are redundant
     - this is no likely though, and still requires more execution
