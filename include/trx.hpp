@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-
+#include "smart_assert.hpp"
 
 class rx_usable {
 public: //observable
@@ -43,7 +43,6 @@ class publishedObservable : public rx_usable {
 } _clients;
 
 public:
-//clients_t<typeN> _clients;
 
     inline void direct_exit_next(typeN val) {
        for(int i =0; i<_clients.size; i++){
@@ -84,7 +83,15 @@ public:
             if (DEBUG) std::cout << "[SOURCE] 0 > source0 unregistered client " <<  (i+1) << "\n" << std::flush;
         }
       }
-    } 
+    }
+
+    int activeClientsCount(){
+      int count =0;
+      for(int i =0; i<_clients.size; i++){
+        count += _clients.enabled[i] ?1:0;
+      }
+      return count;
+    }
 };
 
-
+#undef DEBUG

@@ -5,7 +5,7 @@ def no_capture(mask):       # for regex
 
 
 def getPatterns():
-    return "(.*)(" + "|".join([no_capture(o[1]) for o in getRxGrammar()])  + ")(.*)"
+    return "(.*)(" + "|".join([no_capture(o[1]) if o[1].startswith("from") else "\n[\t ]*"+no_capture(o[1]) for o in getRxGrammar()])  + ")(.*)"
 
 def getall(txt,capture):
     r = re.search(capture,txt,re.DOTALL)
@@ -45,17 +45,25 @@ def getRxGrammar():
         "",
         "namedSequence(op,a(1),a(2))"],
     [   "scan0",
-        'scan\s+(\w+)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*\{',
-        "(.*)\}\s*",
-        "scan(op,name,captype,capture,'{return ' + a(1) +';}',a(2),a(3),'{' + b(1) +'}')"], 
+        'scan\s+(\w+)->(\w+\s*\[\s*\w+\s*\]\s*)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*(\{.*\})\s*,\s*(\w+)\s*=>\s*(.*)',
+        "",
+        "select(op,name,captype,capture,a(4),'{ typedef decltype('+a(1)+'->'+a(2)+') _'+a(3)+'; auto accumulate = [](_'+a(3)+' '+a(3)+',type%(deci)d '+a(4)+')'+a(5)+'; auto project = [](_'+a(3)+' '+a(6)+'){ return '+a(7)+';}; '+a(1)+'->'+a(2)+' = accumulate('+a(1)+'->'+a(2)+','+a(4)+'); return project('+a(1)+'->'+a(2)+'); }')"], 
     [   "scan1",
-        'scan\s+(\w+)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>',
-        "(.*)\s*",
-        "scan(op,name,captype,capture,'{return ' + a(1) +';}',a(2),a(3),'{return ' + b(1) +';}')"], 
+        'scan\s+\[\s*(\w+)(s*\])\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*(\{.*\})\s*,\s*(\w+)\s*=>\s*(.*)',
+        "",
+        "scan(op,name,captype,capture,a(4),'{ typedef decltype('+a(1)+'[0]) _'+a(3)+'; auto accumulate = [](_'+a(3)+' '+a(3)+',type%(deci)d '+a(4)+')'+a(5)+'; auto project = [](_'+a(3)+' '+a(6)+'){ return '+a(7)+';}; '+a(1)+'[index] = accumulate('+a(1)+'[index],'+a(4)+'); return project('+a(1)+'[index]); }', a(1))"], 
+    [   "scan2",
+        'scan\s+(\w+)->(\w+)\s*,\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s*=>\s*(\{.*\})\s*,\s*(\w+)\s*=>\s*(.*)',
+        "",
+        "select(op,name,captype,capture,a(4),'{ typedef decltype('+a(1)+'->'+a(2)+') _'+a(3)+'; auto accumulate = [](_'+a(3)+' '+a(3)+',type%(deci)d '+a(4)+')'+a(5)+'; auto project = [](_'+a(3)+' '+a(6)+'){ return '+a(7)+';}; '+a(1)+'->'+a(2)+' = accumulate('+a(1)+'->'+a(2)+','+a(4)+'); return project('+a(1)+'->'+a(2)+'); }')"], 
     [   "selectmany",
         'selectmany\s+(\w+)\s*,\s*\[\s*(\w*)\]\s*=>',
         "",
         "selectmany(op,name,a(1),a(2))"], 
+    [   "merge",
+        'merge\s+\[\s*(\w*)\s*\]\s*=>',
+        "",
+        "merge(op,name,a(1))"], 
     [   "where0",
         "where\s+(\w+)\s*=>\s*\{",
         "(.*)\}\s*",
@@ -112,6 +120,10 @@ def getRxGrammar():
         "fromRange\<(\w+)\>",
         "\s*\((.+),(.+)\)\s*",
         "fromRange(op,a(1),b(1),b(2),name,captype,capture)"],
+    [   "never",
+        "fromNever\<(\w+)\>",
+        "\s*\(\s*\)\s*",
+        "never(op,a(1),name)"],
     ]
 
 

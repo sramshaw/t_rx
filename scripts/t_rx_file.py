@@ -29,7 +29,7 @@ def reset():
 def countRank(op):
     global rank
     i = rank
-    if op == 'namedSequence' or op == 'selectmany':
+    if op == 'namedSequence' or op == 'selectmany' or op == 'merge':
         rank = rank +1
     if op == 'endSequence':
         rank = rank -1
@@ -113,10 +113,10 @@ def generateTypes_i_o(i,o,name):
     ret = ""
     if hasattr(o,"ops"):
         sub = generateTypes(name+ "_" + str(i), o.ops, name+"_type"+str(i-1))
-        ret = ret + sub[0]
-        array = "\nstd::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+"_sequence"+str(i)+"_array={"+",".join(["[_creator_]" for j in range(0, int(o.maxConcurrent))])+"};"
-        array_type = "\ntypedef std::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+ "_" + str(i)+"_sub_array;"
-        ret = ret + array.replace('[_creator_]',sub[1])
+        ret = ret + sub[0] 
+        array = "\nstd::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+"_sequence"+str(i)+"_array={"+",".join(["[_creator"+str(i)+"_]" for j in range(0, int(o.maxConcurrent))])+"};"
+        array_type = "\ntypedef std::array<"+name+ "_" + str(i)+"_sub,"+o.maxConcurrent+"> "+name+ "_" + str(i)+"_sub_array_type;"
+        ret = ret + array.replace('[_creator'+str(i)+'_]',sub[1])
         ret += array_type;
     #print o
     ret = ret + "\n" + (o.outputType if hasattr(o,'outputType') else '')
@@ -125,9 +125,16 @@ def generateTypes(name, operators, parent_type):
     ret = "".join([generateTypes_i_o(i,o,name) for i,o in enumerate(operators)])
     types_list = ( [parent_type]
            + [name+"_type" + str(i) for i,o in enumerate(operators)] 
-           + [name+"_"+str(i)+"_sub_array" for i,o in enumerate(operators) if hasattr(o,"ops")])
+           + [(name+"_"+str(i)+"_sub_array_type") if hasattr(o,"ops") else
+              (o.my_capture_type)                 if hasattr(o,"my_capture_type") else ""
+               for i,o in enumerate(operators) if hasattr(o,'internal_dcl')]
+           )
     ret = ret + "\ntypedef "+name+"<" + ",".join(types_list) +"> "+name+"_sub;"
-    return [ret,name+"_sub("+",".join([name+"_sequence"+str(i)+"_array" for i,o in enumerate(operators) if hasattr(o,"ops")])+")"]
+    return [ret,name+"_sub("+",".join(
+        [(name+"_sequence"+str(i)+"_array")  if hasattr(o,"ops") else
+         (o.special_capture)                 if hasattr(o,"special_capture") else ""
+         for i,o in enumerate(operators) if hasattr(o,'internal_dcl')]
+        )+")"]
 
 def clang_save(filename,txt):
     with open(filename,"w") as f:
@@ -145,7 +152,7 @@ def getHpp(operators):
     print(rootOperator)
     print('####----------------')
     name = rootOperator.name
-    ret = "#include <functional>\n#include <array>"
+    ret = "#include <functional>\n#include <array>\n#define DEBUG false\n"
     ret = ret + getStandaloneDeclarations(rootOperator.ops)
     ret = ret + rootOperator.class_definition
     ret = ret + "\n\n #define T_RX_CREATE_" + name + "() \\\n"
@@ -161,7 +168,7 @@ def getCpp(operators,codeBefore,codeAfter,originalSequenceCode,hppname):
     rootOperator = operators[0]
     name = rootOperator.name
     #cpp = '#include "../../include/trx.hpp"\n#include "' + hppname + '"\n\n'
-    cpp = codeBefore + "/*" + originalSequenceCode + "*/\n  T_RX_CREATE_" + name + "()\n" + codeAfter
+    cpp = codeBefore + "\n/*" + originalSequenceCode[1:] + "*/    T_RX_CREATE_" + name + "()\n" + codeAfter
     return cpp
 
 def generateCodeForOneFile(fullname):
@@ -170,7 +177,7 @@ def generateCodeForOneFile(fullname):
     cppname = filename + ".t-rx.out.cpp"
  
     original = getContents(fullname)
-    includePattern = "(.*)([\/\\\\\\\"]trx\.hpp\")(.*)"
+    includePattern = "(.*)([\/\\\\\\\"]trx\.hpp\"\n)(.*)"
     r = re.search(includePattern,original,re.DOTALL)
     if not r:
         print("[" + fullname + "]----------------------- does not contain any Rx")    
@@ -178,7 +185,7 @@ def generateCodeForOneFile(fullname):
     a = r.group(1)
     b = r.group(2)
     c = r.group(3)
-    original = a + b + "\n#include \"" + os.path.basename(hppname) + "\""+c
+    original = a + b + "#include \"" + os.path.basename(hppname) + "\""+c
     
    
     print("[" + fullname + "]----------------------- PARSE")    

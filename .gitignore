@@ -5,3 +5,6 @@
 *.swo
 *.log
 *.exe*
+*.autorun
+*.debug
+*-debug

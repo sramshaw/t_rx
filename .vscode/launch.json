@@ -2,6 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debugger: tirnsr_rx.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/tirnsr_rx.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-f",
+                "${workspaceFolder}/examples/showcase/unittest_merge_never_wont_complete.t-rx.in.cpp"
+            ]
+        },
+        {
             "name": "Debug pythagorian",
             "type": "cppdbg",
             "request": "launch",
@@ -40,6 +51,26 @@
                 }
             ],
             "preLaunchTask": "Build All"
+        },
+        {
+            "name": "Debug unit test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/showcase/unit-test-debug",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            // "preLaunchTask": "Build All"
         }
     ]
 }

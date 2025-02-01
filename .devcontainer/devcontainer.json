@@ -22,7 +22,8 @@
 				"csholmq.excel-to-markdown-table",
 				"ms-azuretools.vscode-docker",
 				"yzhang.markdown-all-in-one",
-				"ms-python.python"
+				"ms-python.python",
+				"aaron-bond.better-comments"
 			]
 		}
 	}

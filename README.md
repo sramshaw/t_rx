@@ -1,8 +1,8 @@
 ## [ti-re:ks] The tiny C/C++ Rx implementation
 ### Foreword
-T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It offers a flatmap and fluent way to combine lambdas. All memory is reserved on the stack, nothing on the heap.
+T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It offers a flatmap and fluent way to combine C# inspired lambdas. All memory is reserved on the stack, nothing on the heap.
 
-This is aiming at programs that need to fit on 32kB (Ex: single Parallela core).
+This is aiming at programs that need to fit on 32kB (Ex: single [Parallela](https://www.adapteva.com/parallella/) core).
  
 ReactiveX [Rx] is a powerful language that can change, where applicable, the way we code event based systems. It can and has been used in place of what would have been accomplished via small interpreters and/or state machines.
 
@@ -19,8 +19,12 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [Notes](#notes)
     - [uml diagram using plantuml plugin](#uml-diagram-using-plantuml-plugin)
     - [tooling versions](#tooling-versions)
+  - [contribute](#contribute)
   - [release notes](#release-notes)
+  - [coming next](#coming-next)
   - [design](#design)
+    - [pythagorian example, inspired by RxCpp's example, which this design needs to beat by a lot to be worth using](#pythagorian-example-inspired-by-rxcpps-example-which-this-design-needs-to-beat-by-a-lot-to-be-worth-using)
+  - [references](#references)
 
 
 ### Goal
@@ -34,7 +38,7 @@ Having focused on small C systems for the better part of a decade, then having p
 The project aims at small programs running on micro processors, say for instance a 16bit processor with 64KB of program space. The main behavior will remain single core and single threaded.
 
 ### Architecture
-The main contribution required to make event handling palatable to small systems is a brutal shrinking of the executable. RxCpp will take most likely a minimum of 300KB for a basic implementation, for instance look at the pythagorian example. 
+The main contribution required to make event handling palatable to small systems is a brutal shrinking of the executable. RxCpp will take most likely a minimum of 300KB for a basic implementation, for instance look at the [pythagorian example](https://github.com/ReactiveX/RxCpp/blob/main/Rx/v2/examples/pythagorian/main.cpp). 
 Here we achieve shrinking by simplifying the sequences and observables at compile time.
 
 ### Design decisions
@@ -47,17 +51,17 @@ Here we achieve shrinking by simplifying the sequences and observables at compil
 
 ### Demo
 
-the demo can run by running `./build_and_run.sh`
+the demos and unit tests will all run via `./run.sh` but the use of 'clear' will only leave pythagorian to show in the console at the end. If you want more, comment line 8 (clear) in the 2 `build.sh` files
 
 ### Development
 
 If you are modifying files and wanting to see in vscode terminal the results of your changes live,
-run `./build_and_dev.sh` in your terminal, it will monitor changes to folders listed, and run the ```./run.sh``` script which rebuilds all, applying the preprocessing to the files ending in ```t-rx.in.cpp``` .
+run `./dev.sh` in your terminal, it will monitor changes to folders listed, and run the ```./run.sh``` script which rebuilds all, applying the preprocessing to the files ending in ```t-rx.in.cpp``` .
 
 ### Status : in construction
-The pythagorian example works, the showcase does not yet.
-The capture of lambdas is already done.
-Work needed on observables and observers, mostly wiring, revisiting this via UML sequence diagrams. 
+The pythagorian example works, the showcase does too. This is LINQ type behaviors with sources being immediate. There is no stack limitations at this point.
+The capture of lambdas is already done mostly for select and do operators.
+Work needed on the push story with buffering to allow backpressure at the sources and temporary buffering by a subscriber.
 
 ### Notes
 
@@ -90,8 +94,15 @@ $ clang-format --version
 Ubuntu clang-format version 18.1.3 (1ubuntu1)
 ```
 
+### contribute
+
+So far this is a solo POC, but I am open to suggestions. I believe the parsing approach with regex is flawed and constraining, but workable. For now learning is the main objective, with great results and coverage.
+
+Here is an interesting website for working on the parser with regex, and expecially captures: [https://regex101.com/](https://regex101.com/)
+
+
 ### release notes
-- v0.1 - the original design has the following decomposition of features:
+- v0.1 - the original LINQ like design has the following decomposition of features:
   - sequence class that
     - concatenates most of the operators using a union variable to hold the transformed values over time
     - branches out values to sub sequences as needed for selectmany (aka flatmap)
@@ -107,11 +118,59 @@ Ubuntu clang-format version 18.1.3 (1ubuntu1)
     - we can see that ~250 bytes are spared by this, explained by more inlining
   - note that it is possible to abstract more parts of the system to have a manager that is more generic, and therefore reusable when the templates are redundant
     - this is no likely though, and still requires more execution
+-  v0.3
+   -  scan0, sacn2: operator using simple ints on capture no issue, but limited use when nested in selectmany
+   -  scan1: use explicitly captured accumulator pool, (had issue passing the pool via top of sequence capture like for scan0 and scan2)
+      -  the anonymous struct approach leads to union issue due to non-trivial constructors
+   -  fixes, now captured in unit tests
+
+### coming next
+- [ON HOLD]: gcc13.1+ for C++20 support
+  -  I have a gcc rebuild branch, but will stop users given the time it takes
+  - nice to have for std support of [Designated Initializers](https://github.com/AnthonyCalandra/modern-cpp-features/blob/master/CPP20.md#designated-initializers) etc..
+  - any use of [templates for lambdas](https://github.com/AnthonyCalandra/modern-cpp-features/blob/master/CPP20.md#template-syntax-for-lambdas) ? 
+  - string [starts_with and ends_with operators](https://github.com/AnthonyCalandra/modern-cpp-features/blob/master/CPP20.md#starts_with-and-ends_with-on-strings), for rx/linq concise filtering in where operator etc...
+  - easier creation of arrays as auto vars initialized with [to_array](https://en.cppreference.com/w/cpp/container/array/to_array)
+  - maybe use of [generators (C++23)](https://en.cppreference.com/w/cpp/header/generator) eventually ? though it is not useful for linq like behavior here it seems
+- [READY FOR IMPLEMENTATION] ReactiveX push behavior, using a 
+  - forever loop as background task to advance
+  - sources push to buffers (optimal circular buffers)
+  - operator fromCircular(get function) registers to the advance mechanism
+  - a new operator withLogic put anywhere allows other logic to be serviced (used here to fake data)
+- [RESEARCH] user ease of adoption, more C# like features
+  - attempt to map debugging experience running on the transformed files back to displaying the original file
+    - most promising: https://stackoverflow.com/questions/42234485/showing-original-source-when-debugging-generated-code-in-gdb
+  - color coding of sequence
+    - put the sequence in a comment to avoid intellisense ?
+      - example off [better-comments](https://github.com/aaron-bond/better-comments/blob/master/src/extension.ts) extension plugin for vscode 
+      - use cpp related syntac from [better-cpp](https://github.com/jeff-hykin/better-cpp-syntax/blob/master/autogenerated/cpp.tmLanguage.json) ?
+      - use an anchors like markdown's \`\`\`C  .... \`\`\`
+      - new anchor \`\`\`seq
+  - more operators: buffer
+  - back pressure support via circular buffer, whichever [most standard one c++ provides (is libc++ too much?)](https://stackoverflow.com/a/79102831/19037406) on top of std array would be best
+- [NEXT] use google test for tests, and [google benchmark](https://github.com/google/benchmark)
+  - use test maste
+  - generate benchmarks for alternatives of implementation
+  - review [asymptotic scaling](https://github.com/NAThompson/using_googlebenchmark)?
+- [OBJECTIVES] long term
+  - minimal code for embedded or containers
+    - chaining various wasm modules together using C++ t_rx based plumbing
+      - need support for compilation to wasm 
+    - combine with modules in [embedded Rust](https://docs.rust-embedded.org/book/intro/index.html)
+  - contrast the present rx implementation with what could be a [coroutine (c++20)](https://en.wikipedia.org/wiki/Coroutine) equivalent
+  
 
 ### design
 
+Note that there is a force to try and move the declaration of std:arrays for selectmany and scan from top level into the owning sequence, as the sequence could have enough info to contain the array, however this is not done at the moment.
+For selectmany, the issue comes with what could lead to an automatic allocation of a pool bigger than strictly necessary: first selectmany announces 3 subsequences, second selectmany announces 2subsequences for each of its sequences, auto assignement would be of 3*2 subsequences, maybe an asymetry could lead to 4 or 5 to be enough.
+Instead today we would announce the total instances needed for the second selectmany, for instance: 5.
+In the case of scan, the issue has to do with how to infer the type of accumulator and also initialize the member variable from a lambda in place. I am not sure if that is possible. Instead, a direct capture is done. Direct captures could be made available in other operators as they are easy to handle, but not recommended for unknown uses. not yet time to decide.
+
+#### pythagorian example, inspired by [RxCpp's example](https://github.com/ReactiveX/RxCpp/blob/main/Rx/v2/examples/pythagorian/main.cpp), which this design needs to beat by a lot to be worth using
+
 ```C
-  {
+  { // 
       auto c0= &c;
       sequence seq14 = [c0] => fromRange<unsigned>(1,999)
           select z1 => struct {z = z1, c = c0}
@@ -134,6 +193,7 @@ Ubuntu clang-format version 18.1.3 (1ubuntu1)
       seq14.disable();
   }
 ```
+Below is a graph generated via plantuml, for now built manually, could be autogenerated I suppose. Install the recommended vscode extensions to see the graph in the readme preview. Only for illustration to help navigate the preprocessed code at the moment.
 
 ```plantuml
 @startuml lifecycle of captured variables
@@ -370,3 +430,13 @@ deactivate stack
 @enduml
 
 ```
+
+### references
+other than known Rx.Net and RxCpp
+https://github.com/Cysharp/R3 (improved over https://github.com/neuecc/UniRx)
+https://github.com/victimsnino/ReactivePlusPlus and https://victimsnino.github.io/ReactivePlusPlus/benchmark
+
+the old https://github.com/ReactiveX/RxCpp/tree/main/Rx/v2/examples/pythagorian
+
+compiler online: https://godbolt.org/
+
