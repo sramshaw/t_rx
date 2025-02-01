@@ -1,6 +1,6 @@
 ## [ti-re:ks] The tiny C/C++ Rx implementation
 ### Foreword
-T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It offers a flatmap and fluent way to combine C# inspired lambdas. All memory is reserved on the stack, nothing on the heap.
+T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It is a small DSL that offers flatmap capabilities and a fluent way to combine C# inspired lambdas. All memory is on the stack, no use of new (so far).
 
 This is aiming at programs that need to fit on 32kB (Ex: single [Parallela](https://www.adapteva.com/parallella/) core).
  
@@ -11,7 +11,8 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [Foreword](#foreword)
   - [Goal](#goal)
   - [Targetted systems](#targetted-systems)
-  - [Architecture](#architecture)
+  - [Implementation](#implementation)
+  - [Example](#example)
   - [Design decisions](#design-decisions)
   - [Demo](#demo)
   - [Development](#development)
@@ -37,9 +38,38 @@ Having focused on small C systems for the better part of a decade, then having p
 ### Targetted systems
 The project aims at small programs running on micro processors, say for instance a 16bit processor with 64KB of program space. The main behavior will remain single core and single threaded.
 
-### Architecture
+### Implementation
 The main contribution required to make event handling palatable to small systems is a brutal shrinking of the executable. RxCpp will take most likely a minimum of 300KB for a basic implementation, for instance look at the [pythagorian example](https://github.com/ReactiveX/RxCpp/blob/main/Rx/v2/examples/pythagorian/main.cpp). 
-Here we achieve shrinking by simplifying the sequences and observables at compile time.
+Here we achieve shrinking by simplifying the sequences and observables at compile time. Type deduction is used to give it a C# feel, and no use of parenthesis since it is a DSL already, let's make it lighter. Use of `=>` to distinguish from C++ lambdas.
+In  `selectmany` aka flatmap, the upstream value is recaptured (here as azc , then again azcx) to be usable in the sub-sequence.  
+
+### Example
+Here is how the Pythagorian example is written using t_rx, with the new special keywords {`sequence`, `select`, `do`, `selectmany`, `endObservable`, `fromRange`} :
+```C
+  { // 
+      auto c0= &c;
+      sequence seq14 = [c0] => fromRange<unsigned>(1,999)
+          select z1 => struct {z = z1, c = c0}
+          selectmany 1, [azc] => fromRange<unsigned>(1, azc.z)
+                  select x => struct {z = azc.z, x = x, c = azc.c}
+                  selectmany 1, [azcx] => fromRange<unsigned>(azcx.x, azcx.z)
+                        where  y => { (*azcx.c)++; return azcx.x*azcx.x + y*y == azcx.z*azcx.z; }
+                        select y => struct {x = azcx.x, y =y , z= azcx.z}
+                        do     a => std::cout << " values: xx: " << a.x << ", yy:" <<a.y << ", zz:" << a.z <<'\n'
+                        endObservable
+                  endObservable
+          select a => a.z
+          take 100
+          endObservable
+          ;
+
+      seq14.subscribe(&n_trace, &c_trace, nullptr);
+      if (DEBUG) std::cout << "\nready to go, enable: \n" << std::flush;
+      seq14.enable(c0);
+      seq14.disable();
+  }
+```
+
 
 ### Design decisions
 1. minimal program size via inline, compile time simplifications
