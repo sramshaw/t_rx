@@ -71,27 +71,25 @@ extensions used: [listed here](./.vscode/extensions.json)
 
 
 #### tooling versions
-by running ```./versions.sh``` in the container as per ```./build_and_explore.sh```, here is the snapshot of the versions seen during a successful execution: 
+by running ```./versions.sh``` in the devcontainer, here is the snapshot of the versions seen during a successful execution: 
 
 ```shell
 $ g++ --version
-g++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
-Copyright (C) 2023 Free Software Foundation, Inc.
+g++ (Debian 12.2.0-14) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 
 $ python3 --version
-Python 3.12.3
+Python 3.11.2
 
 $ cat /etc/lsb-release
-DISTRIB_ID=Ubuntu
-DISTRIB_RELEASE=24.04
-DISTRIB_CODENAME=noble
-DISTRIB_DESCRIPTION="Ubuntu 24.04.1 LTS"
+cat: /etc/lsb-release: No such file or directory
 
 $ clang-format --version
-Ubuntu clang-format version 18.1.3 (1ubuntu1)
+Debian clang-format version 14.0.6
+
 ```
 
 ### contribute
