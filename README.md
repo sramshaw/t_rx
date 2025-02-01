@@ -1,13 +1,13 @@
-## [ti-re:ks] The tiny C/C++ Rx implementation
+## [ti-re:ks] The tiny C/C++ Rx implementation (hobby prototype, not for prod)
 ### Foreword
-T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It is a small DSL that offers flatmap capabilities and a fluent way to combine C# inspired lambdas. All memory is on the stack, no use of new (so far).
+T_rx or tirnsr_rx is a tiny version of [ReactiveX [Rx]](http://reactivex.io/intro.html). It is a small DSL that offers flatmap capabilities and a fluent way to combine C# inspired lambdas. All memory is on the stack, no use of new (so far). Beware, made for fun by a C# programmer enthusiastic about Rx.Net, ex C programmer not C++.
 
 This is aiming at programs that need to fit on 32kB (Ex: single [Parallela](https://www.adapteva.com/parallella/) core).
  
 ReactiveX [Rx] is a powerful language that can change, where applicable, the way we code event based systems. It can and has been used in place of what would have been accomplished via small interpreters and/or state machines.
 
 
-- [\[ti-re:ks\] The tiny C/C++ Rx implementation](#ti-reks-the-tiny-cc-rx-implementation)
+- [\[ti-re:ks\] The tiny C/C++ Rx implementation (hobby prototype, not for prod)](#ti-reks-the-tiny-cc-rx-implementation-hobby-prototype-not-for-prod)
   - [Foreword](#foreword)
   - [Goal](#goal)
   - [Targetted systems](#targetted-systems)
