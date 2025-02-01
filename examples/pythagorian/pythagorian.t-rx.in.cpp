@@ -163,6 +163,6 @@ void test_generated(){
                         <<"\n---------------------------------"
                         << "\nnumber of elements traversed: "
                         << "?"
-                        <<" in 3071946 microsecs\n\n"
+                        <<" ? microsecs\n\n"
                         << std::flush;
 }

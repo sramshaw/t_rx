@@ -24,6 +24,7 @@ ReactiveX [Rx] is a powerful language that can change, where applicable, the way
   - [coming next](#coming-next)
   - [design](#design)
     - [pythagorian example, inspired by RxCpp's example, which this design needs to beat by a lot to be worth using](#pythagorian-example-inspired-by-rxcpps-example-which-this-design-needs-to-beat-by-a-lot-to-be-worth-using)
+  - [references](#references)
 
 
 ### Goal
@@ -50,7 +51,7 @@ Here we achieve shrinking by simplifying the sequences and observables at compil
 
 ### Demo
 
-the demo can run by running `./build_and_run.sh`
+the demos and unit tests will all run via `./run.sh` but the use of 'clear' will only leave pythagorian to show in the console at the end. If you want more, comment line 8 (clear) in the 2 `build.sh` files
 
 ### Development
 
